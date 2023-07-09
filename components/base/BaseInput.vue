@@ -1,9 +1,12 @@
 <template>
   <div class="my-3">
-    <p v-if="label" class="text-gray-500 mb-[6px] text-base">{{ label }}</p>
+    <label :for="name" v-if="label" class="text-gray-500 mb-[6px] text-base">{{
+      label
+    }}</label>
 
     <div class="relative h-[42px]">
       <input
+        :id="name"
         class="animate-color h-full px-4 w-full border rounded-[10px] outline-none focus:border-blue-500 text-gray-600"
         :class="{
           'border border-red-400': errorMessage,
@@ -28,7 +31,6 @@
 </template>
 
 <script setup lang="ts">
-import * as Yup from "yup";
 const props = defineProps({
   name: {
     type: String,
@@ -51,13 +53,9 @@ const props = defineProps({
 
 const showPassword = ref(false);
 
-const { errorMessage, value } = useField(
-  () => props.name,
-  Yup.string().required(),
-  {
-    syncVModel: true,
-  }
-);
+const { errorMessage, value } = useField(() => props.name, undefined, {
+  syncVModel: true,
+});
 </script>
 
 <style scoped>

@@ -22,8 +22,18 @@
           label="Password"
           placeholder="Password"
         />
-        <button class="" type="submit">Login</button>
+        <div class="flex justify-between items-center">
+          <base-check-box name="rememberPassword" label="remember me" />
+          <p class="text-blue-600 cursor-pointer">Forgot password?</p>
+        </div>
+        <base-button type="submit">Login</base-button>
       </form>
+      <p class="text-gray-600">
+        No account yet?
+        <nuxt-link to="/register" class="text-blue-600 underline"
+          >Register</nuxt-link
+        >
+      </p>
     </div>
   </div>
 </template>
