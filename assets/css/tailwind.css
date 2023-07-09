@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 body {
-  @apply bg-white;
+  @apply bg-white-gray;
+}
+
+* {
+  font-family: "Source Sans 3", sans-serif;
 }

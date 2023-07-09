@@ -12,6 +12,14 @@
     "@nuxt/devtools": "latest",
     "@nuxtjs/tailwindcss": "^6.8.0",
     "@types/node": "^18",
-    "nuxt": "^3.6.2"
+    "nuxt": "^3.6.2",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@egoist/tailwindcss-icons": "^1.1.0",
+    "@iconify/json": "^2.2.88",
+    "@vee-validate/nuxt": "^4.10.6",
+    "vue": "^3.3.4",
+    "yup": "^1.2.0"
   }
 }
