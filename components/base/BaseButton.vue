@@ -2,9 +2,10 @@
   <div class="h-[42px] my-2">
     <button
       :type="type"
-      class="h-full bg text-center w-full rounded-[10px]"
+      class="h-full bg text-center w-full rounded-[10px] px-4"
       :class="{
-        'bg-blue-500 text-white': variant === 'primary',
+        'bg-blue-600 text-white hover:bg-blue-600 active:bg-blue-700':
+          variant === 'primary',
         'bg-blue-50 text-blue-700': variant === 'primaryRevert',
         'bg-yellow-500 text-gray-950': variant === 'warning',
         'bg-yellow-50 text-yellow-700': variant === 'warningRevert',

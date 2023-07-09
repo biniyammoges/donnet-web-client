@@ -14,6 +14,7 @@
           label="Email or username"
           placeholder="Email or username"
           v-model="email"
+          requried
         />
         <base-input
           v-model="password"
@@ -21,8 +22,9 @@
           type="password"
           label="Password"
           placeholder="Password"
+          requried
         />
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center flex-wrap">
           <base-check-box name="rememberPassword" label="remember me" />
           <p class="text-blue-600 cursor-pointer">Forgot password?</p>
         </div>

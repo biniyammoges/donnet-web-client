@@ -1,10 +1,10 @@
 <template>
   <div class="my-3">
-    <label :for="name" v-if="label" class="text-gray-500 mb-[6px] text-base">{{
-      label
-    }}</label>
+    <label :for="name" v-if="label" class="text-gray-500 text-base"
+      >{{ label }}<span v-if="requried"> *</span></label
+    >
 
-    <div class="relative h-[42px]">
+    <div class="relative h-[42px] mt-1">
       <input
         :id="name"
         class="animate-color h-full px-4 w-full border rounded-[10px] outline-none focus:border-blue-500 text-gray-600"
@@ -49,6 +49,7 @@ const props = defineProps({
     type: String,
   },
   placeholder: String,
+  requried: Boolean,
 });
 
 const showPassword = ref(false);
