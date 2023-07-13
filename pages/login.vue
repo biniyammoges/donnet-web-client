@@ -41,7 +41,16 @@
 </template>
 
 <script setup lang="ts">
+import useAuthApi from "../composables/useAuthApi";
+import { useAuthStore } from "../store/useAuthStore";
 import * as Yup from "yup";
+
+const { login } = useAuthApi();
+const { storeAuthTokens } = useAuthStore();
+
+const loading = ref<boolean>(false);
+const loginError = ref<string | null>(null);
+
 const email = ref("");
 const password = ref("");
 
@@ -52,8 +61,30 @@ const { handleSubmit } = useForm({
   }),
 });
 
-const submit = handleSubmit(() => {
-  console.log(email.value);
-  console.log(password.value);
+const submit = handleSubmit(async () => {
+  // reset error
+  loginError.value = null;
+
+  loading.value = true;
+
+  const { data, error } = await login({
+    emailOrUsername: email.value,
+    password: password.value,
+  });
+
+  loading.value = false;
+
+  if (error.value) {
+    return (loginError.value = error.value.message);
+  }
+
+  if (data.value) {
+    storeAuthTokens(data.value);
+    navigateTo("/");
+  }
+});
+
+useHead({
+  title: "Donnet | Login",
 });
 </script>

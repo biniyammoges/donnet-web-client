@@ -1,7 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: false },
-  modules: ['@nuxtjs/tailwindcss', '@vee-validate/nuxt'],
+  modules: ['@nuxtjs/tailwindcss', '@vee-validate/nuxt', '@pinia/nuxt'],
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: 'http://localhost:3000'
+    }
+  },
   app: {
     head: {
       link: [
@@ -12,6 +17,6 @@ export default defineNuxtConfig({
   },
   veeValidate: {
     autoImports: true
-  }
+  },
 })
 
