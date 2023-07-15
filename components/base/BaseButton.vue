@@ -2,7 +2,7 @@
   <div class="h-[42px] my-2">
     <button
       :type="type"
-      class="h-full bg text-center w-full rounded-[10px] px-4"
+      class="h-full bg text-center w-full rounded-[10px] px-4 flex items-center justify-center"
       :class="{
         'bg-blue-600 text-white hover:bg-blue-600 active:bg-blue-700':
           variant === 'primary',
@@ -13,6 +13,7 @@
         'bg-red-50 text-red-700': variant === 'errorRevert',
       }"
     >
+      <div class="loader" ref="loader"></div>
       <slot />
     </button>
   </div>
@@ -20,6 +21,8 @@
 
 <script setup lang="ts">
 import { PropType } from "vue";
+const loader = ref(null);
+const { $lottie } = useNuxtApp();
 
 const props = defineProps({
   type: {
@@ -39,5 +42,21 @@ const props = defineProps({
     >,
     default: "primary",
   },
+  loading: Boolean,
+});
+
+// onMounted(() => {
+// $lottie.loadAnimation({
+//   container: loader.value!,
+//   path: "../../assets/lottie/loading.json",
+//   autoplay: true,
+//   loop: true,
+// });
+// });
+
+watchEffect(() => {
+  if (props.loading) {
+    // $lottie.play();
+  }
 });
 </script>

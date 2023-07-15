@@ -7,9 +7,15 @@
       <p class="text-gray-600 text-lg font-medium">
         Connect with people and make friends online
       </p>
+      <div
+        class="py-2 px-3 rounded-lg bg-red-50 text-red-900 text-lg my-2"
+        v-if="loginError"
+      >
+        <p>{{ loginError }}</p>
+      </div>
       <form @submit.prevent="submit">
         <base-input
-          type="text"
+          type="email"
           name="email"
           label="Email or username"
           placeholder="Email or username"
@@ -43,7 +49,7 @@
 <script setup lang="ts">
 import useAuthApi from "../composables/useAuthApi";
 import { useAuthStore } from "../store/useAuthStore";
-import * as Yup from "yup";
+import { LoginValidationSchema as validationSchema } from "~/types";
 
 const { login } = useAuthApi();
 const { storeAuthTokens } = useAuthStore();
@@ -54,12 +60,7 @@ const loginError = ref<string | null>(null);
 const email = ref("");
 const password = ref("");
 
-const { handleSubmit } = useForm({
-  validationSchema: Yup.object({
-    email: Yup.string().email().required(),
-    password: Yup.string().min(8).required(),
-  }),
-});
+const { handleSubmit } = useForm({ validationSchema });
 
 const submit = handleSubmit(async () => {
   // reset error
@@ -75,7 +76,16 @@ const submit = handleSubmit(async () => {
   loading.value = false;
 
   if (error.value) {
-    return (loginError.value = error.value.message);
+    if (error.value?.data) {
+      loginError.value = error.value?.data?.message;
+    } else {
+      loginError.value =
+        error.value.response && error.value.response._data.error
+          ? error.value.response._data.error
+          : error?.value.message;
+    }
+
+    return;
   }
 
   if (data.value) {

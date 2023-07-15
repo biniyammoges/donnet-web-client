@@ -1,5 +1,5 @@
 import useAxios from '~/composables/useAxios'
-import { AuthResponse, LoginDto, RegisterDto } from "types/"
+import { AuthResponse, ErrorResponse, LoginDto, RegisterDto } from "types/"
 
 export default function useAuthApi() {
      const login = async (body: LoginDto) => {

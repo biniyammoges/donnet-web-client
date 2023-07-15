@@ -6,6 +6,7 @@
 
     <div class="relative h-[42px] mt-1">
       <input
+        v-bind="attr"
         :id="name"
         class="animate-color h-full px-4 w-full border rounded-[10px] outline-none focus:border-blue-500 text-gray-600"
         :class="{
@@ -26,11 +27,14 @@
         @click="showPassword = !showPassword"
       ></span>
     </div>
-    <p class="text-red-400" v-if="errorMessage">{{ errorMessage }}</p>
+    <p class="text-red-400 text-sm mt-1" v-if="errorMessage">
+      {{ errorMessage }}
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
+const attr = useAttrs();
 const props = defineProps({
   name: {
     type: String,
@@ -46,7 +50,7 @@ const props = defineProps({
   },
   label: String,
   modelValue: {
-    type: String,
+    type: [String, Date, Number],
   },
   placeholder: String,
   requried: Boolean,
