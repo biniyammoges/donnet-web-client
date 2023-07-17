@@ -15,7 +15,6 @@
       </div>
       <form @submit.prevent="submit">
         <base-input
-          type="email"
           name="email"
           label="Email or username"
           placeholder="Email or username"
@@ -90,7 +89,9 @@ const submit = handleSubmit(async () => {
 
   if (data.value) {
     storeAuthTokens(data.value);
-    navigateTo("/");
+    if (process.client) {
+      window.location.href = "/";
+    }
   }
 });
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white text-center">
+  <div class="min-h-screen bg-white-gray text-center">
     <h1 class="text-3xl font-bold">Donnect.com</h1>
     <h1 class="text-xl font-semibold mb-2">
       Leading chat application in the world 2023
@@ -15,4 +15,8 @@
 
 <script setup lang="ts">
 const router = useRouter();
+
+useHead({
+  title: "Feed posts from ...",
+});
 </script>

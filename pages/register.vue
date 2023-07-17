@@ -236,18 +236,17 @@ const submit = async () => {
   // register api call ends
   loading.value = false;
 
-  // checks for expected errors that are sent by server like client (400 - 499) and server (500 - 599) error
-  if (error.value && error.value?.data) {
-    registerError.value = Array.isArray(error.value?.data?.message)
-      ? error.value?.data?.message.join(", ")
-      : error.value?.data?.message;
-  }
-
   // checks for unexpected errors like network error
-  if (error.value && (error.value?.response || error.value.message)) {
+  if (error.value && !error.value?.data) {
     registerError.value = error.value.response?._data?.error
       ? error.value.response?._data.error
       : error?.value?.message;
+  }
+  // checks for expected errors like 'email is already in use'
+  else {
+    registerError.value = Array.isArray(error.value?.data?.message)
+      ? error.value?.data?.message.join(", ")
+      : error.value?.data?.message;
   }
 
   if (data.value) {

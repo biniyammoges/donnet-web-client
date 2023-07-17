@@ -35,7 +35,7 @@ module.exports = {
           8: "#104526",
           9: "#05170D",
         },
-        "white-gray": "F9F9F9",
+        "white-gray": "#F9F9F9",
       },
     },
     fontFamily: {
