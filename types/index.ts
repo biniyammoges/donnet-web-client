@@ -1,4 +1,5 @@
 export * from './auth.type'
-export * from './user.type'
+export * from './entities/user.entity'
 export * from './error.type'
 export * from './vee-schema'
+export * from './entities'

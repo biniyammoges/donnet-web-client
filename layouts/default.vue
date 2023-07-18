@@ -2,8 +2,14 @@
   <div class="hidden sm:block" v-if="tokens?.accessToken">
     <sidebar />
   </div>
-  <div class="flex-1">
+  <div
+    :class="{ 'sm:ml-[80px] md:ml-[244px]': tokens?.accessToken }"
+    class="flex-1"
+  >
     <slot />
+    <div class="sm:hidden">
+      <bottom-tabbar />
+    </div>
   </div>
 </template>
 

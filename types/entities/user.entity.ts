@@ -1,4 +1,4 @@
-export class UserEntity {
+export class User {
      id?: string;
      firstName?: string;
      lastName?: string;
@@ -14,7 +14,7 @@ export class UserEntity {
      createdAt?: Date;
      updatedAt?: Date;
 
-     constructor(data?: Partial<UserEntity>) {
+     constructor(data?: Partial<User>) {
           Object.assign(this, data)
      }
 };

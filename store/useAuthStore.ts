@@ -1,13 +1,13 @@
 import { defineStore } from "pinia";
 import { AuthResponse } from "types";
-import { UserEntity } from "types/user.type";
+import { User } from "types";
 
 export const useAuthStore = defineStore('d', () => {
      // retrieve tokens from cookie when pages refreshs
      const tokensFromCookie = useCookie<AuthResponse | null>('auth-tokens')
 
      const tokens = ref<AuthResponse | null>(tokensFromCookie.value || null)
-     const user = ref<UserEntity | null>(null)
+     const user = ref<User | null>(null)
 
      // returns currently loggedin users
      const getUser = computed(() => user.value);
@@ -29,7 +29,7 @@ export const useAuthStore = defineStore('d', () => {
           }
      }
 
-     const setUser = (data: Partial<UserEntity>) => {
+     const setUser = (data: Partial<User>) => {
           user.value = data
      }
 
