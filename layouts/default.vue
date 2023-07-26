@@ -3,7 +3,7 @@
     <sidebar />
   </div>
   <div
-    :class="{ 'sm:ml-[80px] md:ml-[244px]': tokens?.accessToken }"
+    :class="{ 'sm:ml-[80px] lg:ml-[244px]': tokens?.accessToken }"
     class="flex-1"
   >
     <slot />

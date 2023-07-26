@@ -1,5 +1,7 @@
-export class User {
-     id?: string;
+import { BaseEntity } from "./base.entity";
+import { FileEntity as File } from "./file.entity";
+
+export class User extends BaseEntity {
      firstName?: string;
      lastName?: string;
      username?: string;
@@ -8,13 +10,12 @@ export class User {
      bio?: string;
      location?: string;
      website?: string;
-     avatar?: any;
+     avatar?: File;
      avatarId?: string;
      birthDate?: Date;
-     createdAt?: Date;
-     updatedAt?: Date;
 
      constructor(data?: Partial<User>) {
+          super()
           Object.assign(this, data)
      }
 };

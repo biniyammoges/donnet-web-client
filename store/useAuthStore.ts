@@ -25,7 +25,7 @@ export const useAuthStore = defineStore('d', () => {
           tokensFromCookie.value = null
           user.value = null
           if (process.client) {
-               window.location.href = '/login'
+               // window.location.href = '/login'
           }
      }
 

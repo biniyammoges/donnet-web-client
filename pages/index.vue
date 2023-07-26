@@ -1,6 +1,9 @@
 <template>
-  <div class="min-h-screen bg-white-gray p-4">
-    <Story />
+  <div class="flex lg:justify-center gap-x-4">
+    <div class="min-h-screen bg-gray-100 p-4 max-w-[555px]">
+      <Story />
+    </div>
+    <div class="bg-gray-300 max-w-[300px] w-full hidden lg:block"></div>
   </div>
 </template>
 

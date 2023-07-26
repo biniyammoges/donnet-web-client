@@ -9,13 +9,6 @@
     />
     <div class="overlay"></div>
 
-    <div class="avatar">
-      <img
-        class="h-full absolute top-0 left-0 w-full object-cover z-20"
-        src="~/assets/images/image-1.jpg"
-        alt="image"
-      />
-    </div>
     <div class="z-50 absolute w-full bottom-3">
       <p
         class="truncate creator text-white font-semibold w-full text-xs bottom-3 text-center"
@@ -33,13 +26,7 @@
 
 .overlay {
   @apply absolute top-0 left-0 h-full w-full bg-blue-400 z-30;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0.2),
-    rgba(0, 0, 0, 0.8)
-  );
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .avatar {
