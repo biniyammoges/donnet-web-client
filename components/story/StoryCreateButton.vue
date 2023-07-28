@@ -9,21 +9,16 @@
     />
     <div class="overlay"></div>
 
-    <div class="z-50 absolute w-full bottom-3">
-      <p
-        class="truncate creator text-white font-semibold w-full text-xs bottom-3 text-center"
-      >
-        Biniyam Moges
-      </p>
+    <div class="z-50 w-full absolute bottom-3 border-white">
+      <span class="text-center block text-3xl h-8 text-white">
+        <span class="i-mdi-plus"></span>
+      </span>
+      <h1 class="text-lg text-white text-center">Create</h1>
     </div>
   </div>
 </template>
 
 <style scoped>
-.story-item:hover .story-image {
-  @apply scale-110 transition-transform;
-}
-
 .overlay {
   @apply absolute top-0 left-0 h-full w-full bg-blue-400 z-30;
   background-color: rgba(0, 0, 0, 0.2);

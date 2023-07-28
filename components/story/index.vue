@@ -1,12 +1,15 @@
 <template>
   <div class="mt-3 relative">
-    <button class="story-scroll-btn prev">
+    <button @click="onScroll('left')" class="story-scroll-btn prev">
       <span class="i-mdi-chevron-left"></span>
     </button>
-    <button class="story-scroll-btn right">
+    <button @click="onScroll('right')" class="story-scroll-btn right">
       <span class="i-mdi-chevron-right"></span>
     </button>
-    <div class="story-list overflow-x-auto flex items-center gap-x-3">
+    <div
+      ref="storyContainerRef"
+      class="story-list overflow-x-auto flex items-center gap-x-3 transition-all"
+    >
       <story-create-button />
       <story-item v-for="s of stories" :key="s"></story-item>
     </div>
@@ -14,7 +17,34 @@
 </template>
 
 <script setup lang="ts">
-const stories = [1, 2, 3, 4, 5];
+const stories = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const storyContainerRef = ref<HTMLDivElement | null>(null);
+
+console.log(storyContainerRef.value?.scrollLeft);
+
+const onScroll = (position: "left" | "right") => {
+  const width = storyContainerRef.value?.getBoundingClientRect().width!;
+
+  const currentScrollPosition = storyContainerRef.value?.scrollLeft ?? 0;
+
+  if (storyContainerRef.value && position === "right") {
+    const newScrollPosition = currentScrollPosition + width;
+    storyContainerRef.value.scroll({
+      left: newScrollPosition,
+      behavior: "smooth",
+    });
+  }
+
+  if (storyContainerRef.value && position === "left") {
+    const newScrollPosition = currentScrollPosition - width;
+    storyContainerRef.value.scroll({
+      left: newScrollPosition,
+      behavior: "smooth",
+    });
+  }
+
+  console.log(storyContainerRef.value?.scrollLeft);
+};
 </script>
 
 <style scoped>

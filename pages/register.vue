@@ -251,7 +251,7 @@ const submit = async () => {
 
   if (data.value) {
     storeAuthTokens(data.value);
-    navigateTo("/");
+    if (process.client) window.location.href = "/";
   }
 };
 
