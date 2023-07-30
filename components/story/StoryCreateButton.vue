@@ -9,7 +9,7 @@
     />
     <div class="overlay"></div>
 
-    <div class="z-50 w-full absolute bottom-3 border-white">
+    <div class="z-40 w-full absolute bottom-3 border-white">
       <span class="text-center block text-3xl h-8 text-white">
         <span class="i-mdi-plus"></span>
       </span>
@@ -25,6 +25,6 @@
 }
 
 .avatar {
-  @apply absolute ml-3 mt-3 overflow-hidden h-8 w-8 rounded-full border-2 border-white z-50;
+  @apply absolute ml-3 mt-3 overflow-hidden h-8 w-8 rounded-full border-2 border-white z-40;
 }
 </style>

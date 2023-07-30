@@ -16,7 +16,7 @@
         alt="image"
       />
     </div>
-    <div class="z-50 absolute w-full bottom-3">
+    <div class="z-40 absolute w-full bottom-3">
       <p
         class="truncate creator text-white font-semibold w-full text-xs bottom-3 text-center"
       >
@@ -43,6 +43,6 @@
 }
 
 .avatar {
-  @apply absolute ml-3 mt-3 overflow-hidden h-8 w-8 rounded-full border-2 border-white z-50;
+  @apply absolute ml-3 mt-3 overflow-hidden h-8 w-8 rounded-full border-2 border-white z-40;
 }
 </style>

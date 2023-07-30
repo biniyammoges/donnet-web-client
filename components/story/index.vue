@@ -54,7 +54,7 @@ const onScroll = (position: "left" | "right") => {
 }
 
 .story-scroll-btn {
-  @apply absolute  top-1/2 -translate-y-1/2 z-50 text-3xl text-white h-7 w-7 rounded-full hover:scale-110 border-[0.5px] border-gray-500 flex items-center;
+  @apply absolute  top-1/2 -translate-y-1/2 z-30 text-3xl text-white h-7 w-7 rounded-full hover:scale-110 border-[0.5px] border-gray-500 flex items-center;
   background-color: rgba(0, 0, 0, 0.2);
 }
 

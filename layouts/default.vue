@@ -2,8 +2,14 @@
   <div class="hidden sm:block" v-if="tokens?.accessToken">
     <sidebar />
   </div>
+
+  <!-- Create post form with modal -->
+  <post-create-form />
+
   <div
-    :class="{ 'sm:ml-[80px] lg:ml-[244px]': tokens?.accessToken }"
+    :class="{
+      'sm:ml-[80px] lg:ml-[244px]': tokens?.accessToken,
+    }"
     class="flex-1"
   >
     <slot />

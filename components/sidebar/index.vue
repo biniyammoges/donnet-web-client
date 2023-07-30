@@ -28,7 +28,7 @@
         <div class="mb-3">
           <sidebar-button
             tag="button"
-            @action="() => console.log('sss')"
+            @action="openCreatePostModal"
             title="Create"
           >
             <template #icon><span class="i-mdi-plus"></span> </template>
@@ -71,10 +71,13 @@
 </template>
 
 <script setup lang="ts">
+import { useGlobalStore } from "~/store/useGlobalStore";
 import { useAuthStore } from "~/store/useAuthStore";
 const { getUser, destroyAuthData } = useAuthStore();
+const { openCreatePostModal } = useGlobalStore();
 
 const getFirstAndLastName = computed(
   () => `${getUser?.firstName} ${getUser?.lastName}`
 );
 </script>
+store/useModalStore

@@ -6,6 +6,10 @@ body {
   @apply bg-white-gray;
 }
 
+body.modal-open {
+  @apply overflow-hidden;
+}
+
 * {
   font-family: "Source Sans 3", sans-serif;
 }
