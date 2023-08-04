@@ -18,5 +18,8 @@ export default defineNuxtConfig({
   veeValidate: {
     autoImports: true
   },
+  imports: {
+    dirs: ['types', 'store',]
+  }
 })
 

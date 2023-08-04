@@ -71,10 +71,10 @@
 </template>
 
 <script setup lang="ts">
-import { useGlobalStore } from "~/store/useGlobalStore";
+import { useModalStore } from "~/store/useModalStore";
 import { useAuthStore } from "~/store/useAuthStore";
 const { getUser, destroyAuthData } = useAuthStore();
-const { openCreatePostModal } = useGlobalStore();
+const { openCreatePostModal } = useModalStore();
 
 const getFirstAndLastName = computed(
   () => `${getUser?.firstName} ${getUser?.lastName}`
