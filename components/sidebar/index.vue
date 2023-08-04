@@ -54,7 +54,15 @@
         <div class="mb-3">
           <sidebar-button to="/profile" :title="getFirstAndLastName">
             <template #icon>
-              <span class="i-mdi-user-outline"></span>
+              <img
+                v-if="user?.avatar?.url"
+                :src="user.avatar.url"
+                alt="image"
+                class="h-8 w-8 rounded-full object-cover"
+              />
+              <div v-else class="text-base">
+                {{ joinFirstCharacters(user?.firstName!, user?.lastName!) }}
+              </div>
             </template>
           </sidebar-button>
         </div>
@@ -73,11 +81,11 @@
 <script setup lang="ts">
 import { useModalStore } from "~/store/useModalStore";
 import { useAuthStore } from "~/store/useAuthStore";
-const { getUser, destroyAuthData } = useAuthStore();
+const { getUser: user, destroyAuthData } = useAuthStore();
 const { openCreatePostModal } = useModalStore();
 
 const getFirstAndLastName = computed(
-  () => `${getUser?.firstName} ${getUser?.lastName}`
+  () => `${user?.firstName} ${user?.lastName}`
 );
 </script>
 store/useModalStore

@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: false },
-  modules: ['@nuxtjs/tailwindcss', '@vee-validate/nuxt', '@pinia/nuxt'],
+  modules: ['@nuxtjs/tailwindcss', '@vee-validate/nuxt', '@pinia/nuxt',],
   runtimeConfig: {
     public: {
       apiBaseUrl: 'http://localhost:3001'
@@ -20,6 +20,6 @@ export default defineNuxtConfig({
   },
   imports: {
     dirs: ['types', 'store',]
-  }
+  },
 })
 

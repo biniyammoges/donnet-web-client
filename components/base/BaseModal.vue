@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body" v-if="modelValue">
     <div
-      @click.self="emit('update:modelValue', false)"
+      @click.self="persistant ? null : emit('update:modelValue', false)"
       class="fixed z-50 top-0 left-0 h-screen w-screen flex justify-center items-center bg-[rgba(0,0,0,0.4)]"
     >
       <slot></slot>
@@ -15,6 +15,7 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  persistant: Boolean,
 });
 
 watchEffect(() => {

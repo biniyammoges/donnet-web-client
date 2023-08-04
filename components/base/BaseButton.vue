@@ -1,8 +1,9 @@
 <template>
   <div class="h-[42px] my-2">
     <button
+      :disabled="disabled"
       :type="type"
-      class="h-full bg text-center w-full rounded-[10px] px-4 flex items-center justify-center"
+      class="h-full bg text-center w-full rounded-[10px] px-4 flex items-center justify-center disabled:bg-gray-300 disabled:text-gray-400"
       :class="{
         'bg-blue-600 text-white hover:bg-blue-600 active:bg-blue-700':
           variant === 'primary',
@@ -43,6 +44,7 @@ const props = defineProps({
     default: "primary",
   },
   loading: Boolean,
+  disabled: { type: Boolean, default: false },
 });
 
 // onMounted(() => {
