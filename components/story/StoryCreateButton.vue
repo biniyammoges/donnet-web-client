@@ -1,6 +1,6 @@
 <template>
   <div
-    class="story-item relative flex-shrink-0 w-[80px] h-[142px] overflow-hidden sm:w-[100px] sm:h-[170px] rounded-xl cursor-pointer"
+    class="story-item relative flex-shrink-0 w-full max-w-[90px] h-[142px] overflow-hidden sm:h-[170px] rounded-xl cursor-pointer"
   >
     <img
       class="story-image h-full absolute top-0 left-0 w-full object-cover z-20"

@@ -15,6 +15,7 @@ export class PostEntity extends BaseEntity {
      savedUsers?: SavedPostEntity[]
      likeCount?: number
      commentCount?: number
+     liked?: boolean
 
      constructor(data?: Partial<PostEntity>) {
           super()

@@ -1,5 +1,10 @@
 <template>
-  <div class="h-[42px] my-2">
+  <div
+    class="h-[42px] my-2"
+    :class="{
+      'h-[28px]': size === 'small',
+    }"
+  >
     <button
       :disabled="disabled"
       :type="type"
@@ -12,6 +17,7 @@
         'bg-yellow-50 text-yellow-700': variant === 'warningRevert',
         'bg-red-600 text-white': variant === 'error',
         'bg-red-50 text-red-700': variant === 'errorRevert',
+        'text-sm': size === 'small',
       }"
     >
       <div class="loader" ref="loader"></div>
@@ -23,7 +29,6 @@
 <script setup lang="ts">
 import { PropType } from "vue";
 const loader = ref(null);
-const { $lottie } = useNuxtApp();
 
 const props = defineProps({
   type: {
@@ -45,6 +50,10 @@ const props = defineProps({
   },
   loading: Boolean,
   disabled: { type: Boolean, default: false },
+  size: {
+    type: String as PropType<"small" | "default">,
+    default: "default",
+  },
 });
 
 // onMounted(() => {

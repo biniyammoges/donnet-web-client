@@ -9,6 +9,8 @@ export class User extends BaseEntity {
      email?: string;
      bio?: string;
      location?: string;
+     isOnline?: boolean;
+     lastSeen?: Date | string;
      website?: string;
      avatar?: File;
      avatarId?: string;

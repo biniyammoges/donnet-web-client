@@ -1,42 +1,69 @@
 <template>
-  <div class="flex items-start lg:justify-center gap-x-4">
-    <div class="min-h-scree pt-4 px-4 pb-16 max-w-[550px]">
+  <div class="flex items-start justify-center gap-x-1">
+    <div class="min-h-screen pb-16 max-w-[550px] px-3 sm:px-0">
       <Story />
-      <Post />
+      <div v-if="!posts.length && postLoading" class="mt-4">
+        <h1 class="text-2xl text-gray-600">Loading</h1>
+      </div>
+      <Post v-else />
     </div>
-    <div class="bg-gray-300 pt-4 px-4 pb-16 min-w-[290px] hidden lg:block">
-      <div class="flex justify-between items-center">
+    <div class="pt-3 px-4 pb-16 w-[350px] shrink-0 hidden lg:block">
+      <div
+        class="flex justify-between items-center bg-white p-3 rounded-lg border-[0.3px]"
+      >
         <div class="profile flex">
           <nuxt-link
             to="/"
             class="avatar mr-3 block relative h-10 w-10 rounded-full"
           >
             <img
-              src="~/assets/images/image-1.jpg"
+              v-if="user?.avatar"
+              :src="user.avatar.url"
               alt="image"
-              class="rounded-full"
+              class="h-8 w-8 rounded-full object-cover"
             />
+            <div
+              v-else
+              class="w-9 h-9 rounded-full border text-gray-500 border-gray-500 flex items-center justify-center"
+            >
+              {{ joinFirstCharacters(user?.firstName!, user?.lastName!) }}
+            </div>
             <span
-              class="h-2 w-2 top-0 right-0 absolute rounded-full bg-green-400"
+              class="h-2 w-2 top-1 right-1 absolute rounded-full bg-green-400"
             ></span>
           </nuxt-link>
           <div class="flex flex-col justify-center">
-            <nuxt-link
-              to="/profile"
-              class="text-gray-900 leading-5 hover:underline"
-              >Biniyam Moges</nuxt-link
-            >
-            <p class="text-gray-500 text-base leading-5">iambiniy</p>
+            <p class="text-gray-900 leading-5 truncate">
+              {{ user?.firstName + " " + user?.lastName }}
+            </p>
+            <p class="text-gray-500 text-base leading-5">
+              {{ user?.username }}
+            </p>
           </div>
         </div>
-        <base-button>View</base-button>
+        <base-button size="small" variant="primaryRevert">View</base-button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const router = useRouter();
+import { storeToRefs } from "pinia";
+
+// composables
+const { fetchPosts } = usePostApi();
+const { setPosts } = usePostStore();
+const { user } = useAuthStore();
+
+const { posts } = storeToRefs(usePostStore());
+
+// states
+const { data, pending: postLoading, execute } = await fetchPosts();
+setPosts(data.value!);
+
+onMounted(async () => {
+  await execute();
+});
 
 useHead({
   title: "(1) Donnet",

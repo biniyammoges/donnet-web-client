@@ -9,8 +9,13 @@ export default function usePostApi() {
 
      const fetchPosts = async (filter: FilterQuery = { page: 1, limit: 20 }) => {
           const resp = await useAxios<Paginate<PostEntity>>(`api/post/retrieve/feed?${transformObjectToQuery(filter)}`)
-          return resp.data
+          return resp
      }
 
-     return { createPost, fetchPosts }
+     const likePost = async (postId: string, unlike = false) => {
+          const resp = await useAxios<Paginate<PostEntity>>(`api/post/${postId}/like?${unlike ? 'unlike=true' : ''}`)
+          return resp
+     }
+
+     return { createPost, fetchPosts, likePost }
 };
