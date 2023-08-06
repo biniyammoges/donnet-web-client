@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-start justify-center gap-x-1">
-    <div class="min-h-screen pb-16 max-w-[550px] px-3 sm:px-0">
+    <div class="min-h-screen pb-16 w-full max-w-[550px] px-3 sm:px-0">
       <Story />
       <div v-if="!posts.length && postLoading" class="mt-4">
         <h1 class="text-2xl text-gray-600">Loading</h1>
@@ -55,11 +55,21 @@ const { fetchPosts } = usePostApi();
 const { setPosts } = usePostStore();
 const { user } = useAuthStore();
 
+// state
 const { posts } = storeToRefs(usePostStore());
+const page = ref(1);
+const limit = ref(8);
 
-// states
 const { data, pending: postLoading, execute } = await fetchPosts();
 setPosts(data.value!);
+
+const fetchOnScroll = async () => {
+  const { data } = await fetchPosts({ page: page.value, limit: limit.value });
+  setPosts({
+    data: [...posts.value, ...data.value?.data!],
+    total: data.value?.total!,
+  });
+};
 
 onMounted(async () => {
   await execute();
