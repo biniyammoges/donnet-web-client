@@ -50,6 +50,7 @@
     <!-- Image -->
     <template v-if="post.medias?.length">
       <div
+        @click="openPreviewPostModal(post)"
         class="cursor-pointer max-h-[400px] overflow-hidden border-[0.3px] gap-x-1 flex rounded-xl mt-3"
       >
         <img
@@ -108,10 +109,11 @@
         }}</span>
       </button>
       <button
+        @click="openPreviewPostModal(post)"
         class="flex items-center text-sm py-1 gap-x-[5px] text-gray-500 hover:text-gray-700"
       >
         <span class="i-mdi-comment-outline text-xl"></span
-        ><span>{{ post.commentCount }}</span>
+        ><span>{{ post.commentCount }} comments</span>
       </button>
     </div>
 
@@ -141,6 +143,7 @@ import { PropType } from "vue";
 
 const { likePost } = usePostStore();
 const { likePost: callLikeApi } = usePostApi();
+const { openPreviewPostModal } = useModalStore();
 
 const props = defineProps({
   post: {

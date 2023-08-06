@@ -1,5 +1,6 @@
 <template>
   <div class="w-full mt-4" ref="postRef">
+    <post-detail />
     <post-item v-for="p of posts" :key="p.id" :post="p" />
     <div
       class="hidden mt-4 sflex flex-col items-center rounded-xl py-4 bg-white"
