@@ -55,13 +55,13 @@
       >
         <img
           class="flex-1 w-1/2 rounded-xl object-cover"
-          :src="post.medias[0].file?.url"
+          :src="post.medias[0]?.file?.url"
           alt=""
         />
         <img
           v-if="post.medias?.length === 2"
           class="w-1/2 rounded-xl object-cover"
-          :src="post.medias[1].file?.url"
+          :src="post.medias[1]?.file?.url"
         />
         <div
           class="w-1/2 flex flex-col gap-y-1"
@@ -69,13 +69,13 @@
         >
           <img
             class="w-full h-1/2 rounded-xl object-cover"
-            :src="post.medias[2].file?.url"
+            :src="post.medias[1]?.file?.url"
             alt=""
           />
           <div class="relative w-full h-1/2 overflow-hidden rounded-xl">
             <img
               class="w-full h-full rounded-xl object-cover"
-              :src="post.medias[3].file?.url"
+              :src="post.medias[2]?.file?.url"
               alt=""
             />
             <div

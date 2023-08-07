@@ -1,9 +1,10 @@
 <template>
   <div class="w-full mt-4" ref="postRef">
-    <post-detail />
+    <post-detail"/>
     <post-item v-for="p of posts" :key="p.id" :post="p" />
     <div
-      class="hidden mt-4 sflex flex-col items-center rounded-xl py-4 bg-white"
+      v-if="!posts.length"
+      class="mt-4 flex flex-col items-center rounded-xl py-4 bg-white"
     >
       <div class="max-w-[400px]">
         <div class="flex items-center justify-center">
@@ -17,7 +18,8 @@
         </p>
       </div>
       <base-button
-        ><span class="i-mdi-plus text-2xl"></span> Create Post</base-button
+        ><span class="i-mdi-user-add mr-1 text-xl"></span> FInd
+        Friends</base-button
       >
     </div>
   </div>
