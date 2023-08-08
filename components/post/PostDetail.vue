@@ -121,26 +121,25 @@
             :post="post!"
           />
         </div>
-
-        <!-- Add comment input -->
-        <div
-          class="absolute left-0 bottom-0 right-0 h-10 overflow-hidden rounded-full"
+      </div>
+      <!-- Add comment input -->
+      <div
+        class="absolute left-2 bottom-2 right-2 h-10 overflow-hidden rounded-full"
+      >
+        <input
+          placeholder="Write something about biniyam"
+          class="h-full border-[0.6px] border-gray-400 rounded-full pr-5 pl-10 w-full text-sm"
+        />
+        <button
+          class="absolute top-1/2 -translate-y-1/2 text-xl left-3 h-5 text-gray-400 hover:text-gray-600"
         >
-          <input
-            placeholder="Write something about biniyam"
-            class="h-full border-[0.6px] border-gray-400 rounded-full pr-5 pl-10 w-full text-sm"
-          />
-          <button
-            class="absolute top-1/2 -translate-y-1/2 text-xl left-3 h-5 text-gray-400 hover:text-gray-600"
-          >
-            <span class="i-mdi-emoji-outline"></span>
-          </button>
-          <button
-            class="absolute top-1/2 -translate-y-1/2 text-sm px-4 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white right-1 h-8"
-          >
-            comment
-          </button>
-        </div>
+          <span class="i-mdi-emoji-outline"></span>
+        </button>
+        <button
+          class="absolute top-1/2 -translate-y-1/2 text-sm px-4 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white right-1 h-8"
+        >
+          comment
+        </button>
       </div>
     </div>
   </BaseModal>
