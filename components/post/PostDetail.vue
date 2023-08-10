@@ -1,7 +1,7 @@
 <template>
-  <BaseModal v-model="showPreviewPostModal">
+  <BaseModal v-model="showPreviewPostModal" persistant>
     <div
-      class="relative bg-white rounded-3xl max-h-[700px] overflow-y-hidden overflow-x-hidden h-full px-3 py-3 flex gap-x-3"
+      class="relative bg-white rounded-xl max-h-[700px] overflow-y-hidden overflow-x-hidden h-full px-3 py-3 flex gap-x-3"
     >
       <div
         v-if="post?.medias?.length"
@@ -28,7 +28,8 @@
         />
       </div>
 
-      <div class="relative py-2 pl-2 w-[430px] h-full overflow-y-scroll">
+      <!-- Post detail section -->
+      <div class="relative pt-2 pb-24 pl-2 w-[430px] h-full">
         <div v-if="post" class="flex justify-between items-center">
           <!-- Creator -->
           <div class="creator">
@@ -82,64 +83,86 @@
             </button>
           </div>
         </div>
+        <div class="relative overflow-y-auto h-full">
+          <!-- Captions -->
+          <p v-if="post?.caption" class="mt-3 text-gray-600">
+            {{ post.caption }}
+          </p>
 
-        <!-- Captions -->
-        <p v-if="post?.caption" class="mt-3 text-gray-600">
-          {{ post.caption }}
-        </p>
+          <!-- Actions -->
+          <div class="flex items-center mt-1 gap-x-3">
+            <button
+              @click="like"
+              class="flex items-center text-sm py-[7px] gap-x-[5px]"
+            >
+              <span
+                :class="[post?.liked ? 'i-mdi-heart ' : 'i-mdi-heart-outline']"
+                class="text-2xl text-blue-600"
+              ></span>
+              <span class="text-gray-500" v-if="post?.likeCount">{{
+                post?.likeCount
+              }}</span>
+            </button>
+            <button
+              class="flex items-center text-sm py-1 gap-x-[5px] text-gray-500 hover:text-gray-700"
+            >
+              <span class="i-mdi-comment-outline text-xl"></span
+              ><span>{{ post?.commentCount }} comments</span>
+            </button>
+          </div>
 
-        <!-- Actions -->
-        <div class="flex items-center mt-1 gap-x-3">
-          <button
-            @click="like"
-            class="flex items-center text-sm py-[7px] gap-x-[5px]"
-          >
-            <span
-              :class="[post?.liked ? 'i-mdi-heart ' : 'i-mdi-heart-outline']"
-              class="text-2xl text-blue-600"
-            ></span>
-            <span class="text-gray-500" v-if="post?.likeCount">{{
-              post?.likeCount
-            }}</span>
-          </button>
-          <button
-            class="flex items-center text-sm py-1 gap-x-[5px] text-gray-500 hover:text-gray-700"
-          >
-            <span class="i-mdi-comment-outline text-xl"></span
-            ><span>{{ post?.commentCount }} comments</span>
-          </button>
+          <!-- divider -->
+          <div class="h-[1px] w-full bg-gray-200 mt-3"></div>
+
+          <!-- comments -->
+          <div class="mt-2">
+            <h1
+              v-if="commentLoading && !post?.comments?.length"
+              class="text-2xl text-gray-500"
+            >
+              Loading comments
+            </h1>
+            <CommentItem
+              v-for="comment of post!.comments??[]"
+              :key="comment.id"
+              :comment="comment"
+            />
+            <div
+              v-if="!post?.comments?.length"
+              class="flex flex-col items-center justify-center"
+            >
+              <h1 class="text-gray-500 text-lg flex items-center gap-x-1">
+                <span class="i-mdi-smiley-cry-outline text-xl"></span> No
+                comments so far!
+              </h1>
+              <p class="text-sm text-gray-400">be the first one to comment!</p>
+            </div>
+          </div>
         </div>
 
-        <!-- divider -->
-        <div class="h-[1px] w-full bg-gray-200 mt-3"></div>
+        <!-- Add comment input -->
+        <div class="absolute left-2 bottom-0 right-2 overflow-hidden">
+          <button
+            class="absolute bottom-[18px] text-xl left-3 h-5 text-gray-400 hover:text-gray-600"
+          >
+            <span class="i-mdi-emoji-outline"></span>
+          </button>
+          <textarea
+            @input="handleTextAreaHeight"
+            ref="textAreaRef"
+            class="bg-gray-50 resize-none w-full py-2 text-gray-600 max-h-[100px] outline-none transition-all px-9 border border-gray-300 rounded-lg"
+            :placeholder="`Write something about ${post?.creator?.firstName}'s post?`"
+            v-model="commentDto.text"
+            rows="1"
+          ></textarea>
 
-        <!-- comments -->
-        <div class="mt-2">
-          <CommentItem
-            v-for="comment of comments"
-            :key="comment"
-            :post="post!"
-          />
+          <button
+            @click="comment"
+            class="absolute bottom-3 text-sm px-4 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white right-1 h-8"
+          >
+            comment
+          </button>
         </div>
-      </div>
-      <!-- Add comment input -->
-      <div
-        class="absolute left-2 bottom-2 right-2 h-10 overflow-hidden rounded-full"
-      >
-        <input
-          placeholder="Write something about biniyam"
-          class="h-full border-[0.6px] border-gray-400 rounded-full pr-5 pl-10 w-full text-sm"
-        />
-        <button
-          class="absolute top-1/2 -translate-y-1/2 text-xl left-3 h-5 text-gray-400 hover:text-gray-600"
-        >
-          <span class="i-mdi-emoji-outline"></span>
-        </button>
-        <button
-          class="absolute top-1/2 -translate-y-1/2 text-sm px-4 py-1 rounded-full bg-blue-500 hover:bg-blue-600 text-white right-1 h-8"
-        >
-          comment
-        </button>
       </div>
     </div>
   </BaseModal>
@@ -147,17 +170,29 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
+import { CreateCommentDto } from "types";
 
 const postModal = useModalStore();
-const { likePost } = usePostStore();
-const { likePost: callLikeApi } = usePostApi();
-const comments = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const { likePost, updateCommentCount, setComments } = usePostStore();
+const { likePost: callLikeApi, createComment, fetchComments } = usePostApi();
 
 // states
 const { showPreviewPostModal, selectedPost: post } = storeToRefs(postModal);
-const hasPostManyImages = computed(() => post.value?.medias?.length! > 0);
+const commentDto = reactive<CreateCommentDto>({
+  text: "",
+  parentCommentId: "",
+  postId: "",
+});
+const usernameToReply = ref<string | null>(null);
+const textAreaRef = ref<HTMLTextAreaElement | null>(null);
+const hasPostManyImages = computed(() => post.value?.medias?.length! > 1);
+const commentLoading = ref(false);
 
-const emits = defineEmits(["close"]);
+// Handles textarea height as user enter the text
+const handleTextAreaHeight = () => {
+  const scrollHeight = textAreaRef.value?.scrollHeight;
+  textAreaRef.value!.style.height = scrollHeight + "px";
+};
 
 const like = async () => {
   if (post.value) {
@@ -196,6 +231,39 @@ const backward = () => {
     activeImageIndex.value = post.value?.medias?.length!;
   }
 };
+
+const comment = async () => {
+  const { data, error } = await createComment({
+    ...commentDto,
+    postId: post.value?.id,
+  });
+  if (data.value) {
+    updateCommentCount(post.value?.id!);
+    post.value!.commentCount! += 1;
+    post.value!.comments?.push(data.value);
+  }
+
+  if (!error.value) {
+    commentDto.text = "";
+    commentDto.parentCommentId = "";
+    usernameToReply.value = "";
+  }
+};
+
+watchEffect(async () => {
+  if (showPreviewPostModal.value && post.value?.id) {
+    commentLoading.value = true;
+    const { data, error, pending, execute } = await fetchComments(
+      post.value?.id!
+    );
+    commentLoading.value = false;
+
+    if (data.value) {
+      setComments(post.value.id, data.value.data);
+      post.value.comments = data.value.data;
+    }
+  }
+});
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { Paginate } from "types";
+import { CommentEntity, Paginate } from "types";
 import { PostEntity } from "types/entities/post/post.entity";
 
 export const usePostStore = defineStore('post-store', () => {
@@ -28,5 +28,26 @@ export const usePostStore = defineStore('post-store', () => {
           }
      }
 
-     return { posts, getPosts, addPost, setPosts, likePost }
+     const updateCommentCount = (postId: string, add = true) => {
+          const idx = posts.value.findIndex(p => p.id === postId);
+          if (idx > -1) {
+               posts.value[idx] = {
+                    ...posts.value[idx],
+                    commentCount:
+                         add ? posts.value[idx].commentCount! + 1 : posts.value[idx].commentCount! - 1
+               }
+          }
+     }
+
+     const setComments = (postId: string, comments: CommentEntity[]) => {
+          const idx = posts.value.findIndex(p => p.id === postId);
+          if (idx > -1) {
+               posts.value[idx] = {
+                    ...posts.value[idx],
+                    comments
+               }
+          }
+     }
+
+     return { posts, getPosts, addPost, setPosts, likePost, updateCommentCount, setComments }
 })

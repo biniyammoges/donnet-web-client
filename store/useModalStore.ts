@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { PostEntity } from "types";
+import { CommentEntity, PostEntity } from "types";
 
 export const useModalStore = defineStore('post-modal-store', () => {
      // states
@@ -22,6 +22,7 @@ export const useModalStore = defineStore('post-modal-store', () => {
           selectedPost.value = null
      }
 
+
      return {
           // create post modals
           createPostModal,
@@ -33,6 +34,7 @@ export const useModalStore = defineStore('post-modal-store', () => {
           selectedPost,
           showPreviewPostModal,
           openPreviewPostModal,
-          closePreviewPostModal
+          closePreviewPostModal,
+
      }
 })
