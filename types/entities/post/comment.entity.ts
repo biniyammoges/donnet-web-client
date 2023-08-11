@@ -15,6 +15,7 @@ export class CommentEntity extends BaseEntity {
      likes?: CommentLikeEntity[]
      likeCount?: number
      replyCount?: number
+     liked?: boolean
 
      constructor(data?: Partial<CommentEntity>) {
           super()

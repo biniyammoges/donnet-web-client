@@ -1,5 +1,6 @@
 <template>
   <div class="flex py-3">
+    <!-- Commentor Profile Detail -->
     <nuxt-link to="/" class="avatar mr-1 block relative h-8 w-8 rounded-full">
       <img
         v-if="comment?.commentor?.avatar"
@@ -22,7 +23,9 @@
         class="hidden h-2 w-2 top-1 right-1 absolute rounded-full bg-green-500"
       ></span>
     </nuxt-link>
+
     <div>
+      <!-- Commentor name and date the comment created -->
       <div class="flex items-center justify-between gap-x-1">
         <nuxt-link
           to="/profile"
@@ -35,13 +38,20 @@
           dateToTimeAgo(new Date(comment?.createdAt!))
         }}</span>
       </div>
+
+      <!-- Comment text -->
       <p class="text-gray-500">
         {{ comment?.text }}
       </p>
+
+      <!-- Comments Actions -->
       <div class="flex items-center gap-x-3">
-        <button class="flex items-center text-sm py-[7px] gap-x-[5px]">
+        <button
+          @click="likeComment"
+          class="flex items-center text-sm py-[7px] gap-x-[5px]"
+        >
           <span
-            :class="[false ? 'i-mdi-heart ' : 'i-mdi-heart-outline']"
+            :class="[comment?.liked ? 'i-mdi-heart ' : 'i-mdi-heart-outline']"
             class="text-2xl text-blue-600"
           ></span>
           <span class="text-gray-500" v-if="comment?.likeCount"
@@ -64,6 +74,8 @@
       <button v-if="comment?.replyCount" class="text-blue-800 text-sm">
         Show replies
       </button>
+      <!-- Replies -->
+      <div>'helooooooo'</div>
     </div>
   </div>
 </template>
@@ -74,4 +86,17 @@ import { CommentEntity } from "~/types";
 const props = defineProps({
   comment: CommentEntity,
 });
+
+const { likeComment: callLikeCommentApi } = usePostApi();
+const { likeComment: updateCommentModalState } = useModalStore();
+const { likeComment: updateCommentOnPostStore } = usePostStore();
+
+const likeComment = async () => {
+  const { data } = await callLikeCommentApi(
+    props.comment?.id!,
+    props.comment?.liked
+  );
+  updateCommentModalState(props.comment?.id!);
+  updateCommentOnPostStore(props.comment?.postId!, props.comment?.id!);
+};
 </script>

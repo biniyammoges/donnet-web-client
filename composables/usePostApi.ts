@@ -27,5 +27,10 @@ export default function usePostApi() {
           return resp
      }
 
-     return { createPost, fetchPosts, likePost, createComment, fetchComments }
+     const likeComment = async (commentId: string, unlike = false) => {
+          const resp = await useAxios<Paginate<PostEntity>>(`api/comment/${commentId}/like?${unlike ? 'unlike=true' : ''}`)
+          return resp
+     }
+
+     return { createPost, fetchPosts, likePost, createComment, fetchComments, likeComment }
 };

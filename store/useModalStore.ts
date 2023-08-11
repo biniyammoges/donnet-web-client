@@ -21,6 +21,23 @@ export const useModalStore = defineStore('post-modal-store', () => {
           showPreviewPostModal.value = false
           selectedPost.value = null
      }
+     const likeComment = (commentId: string, unlike = false) => {
+          if (selectedPost.value) {
+               const comments = selectedPost.value.comments ?? [];
+               const commentIdx = comments.findIndex(c => c.id === commentId);
+
+               if (commentIdx > -1) {
+                    comments[commentIdx].liked = !unlike
+
+                    console.log(comments)
+                    selectedPost.value = {
+                         ...selectedPost.value,
+                         comments
+                    }
+               }
+          }
+
+     }
 
 
      return {
@@ -32,6 +49,8 @@ export const useModalStore = defineStore('post-modal-store', () => {
 
           // preview postmodal
           selectedPost,
+          likeComment,
+
           showPreviewPostModal,
           openPreviewPostModal,
           closePreviewPostModal,

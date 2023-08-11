@@ -30,7 +30,7 @@
 
       <!-- Post detail section -->
       <div class="relative pt-2 pb-24 pl-2 w-[430px] h-full">
-        <div v-if="post" class="flex justify-between items-center">
+        <div v-if="post" class="flex justify-between items-center mb-3">
           <!-- Creator -->
           <div class="creator">
             <nuxt-link
@@ -49,8 +49,8 @@
               >
                 {{
                   joinFirstCharacters(
-                    post.creator?.firstName!,
-                    post.creator?.lastName!
+                    post.creator?.firstName,
+                    post.creator?.lastName
                   )
                 }}
               </div>
@@ -83,9 +83,10 @@
             </button>
           </div>
         </div>
+
         <div class="relative overflow-y-auto h-full">
           <!-- Captions -->
-          <p v-if="post?.caption" class="mt-3 text-gray-600">
+          <p v-if="post?.caption" class="text-gray-500">
             {{ post.caption }}
           </p>
 
@@ -123,7 +124,7 @@
               Loading comments
             </h1>
             <CommentItem
-              v-for="comment of post!.comments??[]"
+              v-for="comment of post?.comments ?? []"
               :key="comment.id"
               :comment="comment"
             />
@@ -141,7 +142,7 @@
         </div>
 
         <!-- Add comment input -->
-        <div class="absolute left-2 bottom-0 right-2 overflow-hidden">
+        <div class="absolute left-0 -bottom-2 right-0 overflow-hidden">
           <button
             class="absolute bottom-[18px] text-xl left-3 h-5 text-gray-400 hover:text-gray-600"
           >
