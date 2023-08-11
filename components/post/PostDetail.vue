@@ -113,7 +113,7 @@
           </div>
 
           <!-- divider -->
-          <div class="h-[1px] w-full bg-gray-200 mt-3"></div>
+          <div class="h-[1px] w-full bg-gray-200 mt-2"></div>
 
           <!-- comments -->
           <div class="mt-2">

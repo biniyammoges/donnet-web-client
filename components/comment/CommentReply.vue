@@ -1,5 +1,5 @@
 <template>
-  <div class="flex py-2">
+  <div class="flex py-3">
     <!-- Commentor Profile Detail -->
     <nuxt-link to="/" class="avatar mr-1 block relative h-8 w-8 rounded-full">
       <img
@@ -20,17 +20,20 @@
         }}
       </div>
       <span
-        v-if="comment?.commentor?.isOnline"
-        class="h-2 w-2 top-0 right-1 absolute rounded-full bg-green-500"
+        class="hidden h-2 w-2 top-1 right-1 absolute rounded-full bg-green-500"
       ></span>
     </nuxt-link>
 
     <div>
       <!-- Commentor name and date the comment created -->
       <div class="flex items-center gap-x-2">
-        <nuxt-link to="/profile" class="text-gray-600 hover:underline">{{
-          comment?.commentor?.firstName + " " + comment?.commentor?.lastName
-        }}</nuxt-link>
+        <nuxt-link
+          to="/profile"
+          class="text-gray-500 hover:underline text-base"
+          >{{
+            comment?.commentor?.firstName + " " + comment?.commentor?.lastName
+          }}</nuxt-link
+        >
         <span class="text-xs text-gray-400">{{
           dateToTimeAgo(new Date(comment?.createdAt!))
         }}</span>
@@ -55,35 +58,18 @@
             >{{ comment?.likeCount }} likes</span
           >
         </button>
-        <button
-          class="flex items-center text-sm py-1 gap-x-[5px] text-gray-500 hover:text-gray-700"
-        >
-          <span class="i-mdi-comment-outline text-lg"></span
-          ><span>{{ comment?.replyCount }} replies</span>
-        </button>
 
         <button
+          @click="
+            emit('onReply', {
+              username: comment?.commentor?.username,
+              parentid: comment?.parentCommentId,
+            })
+          "
           class="flex items-center text-sm py-1 gap-x-[5px] text-gray-500 hover:text-blue-700"
         >
           <span class="i-mdi-reply-outline text-xl"></span><span> reply</span>
         </button>
-      </div>
-
-      <div class="flex items-center gap-x-2">
-        <div class="h-[1px] bg-gray-400 w-5"></div>
-        <button
-          @click="toggleReply"
-          v-if="!comment?.replyCount"
-          class="text-gray-500 text-sm"
-        >
-          {{ showReplies ? "Hide" : "Show" }} replies
-        </button>
-        <div class="h-[1px] bg-gray-400 w-5"></div>
-      </div>
-
-      <!-- Replies -->
-      <div v-if="showReplies">
-        <CommentReply :comment="comment" />
       </div>
     </div>
   </div>
@@ -93,13 +79,14 @@
 import { CommentEntity } from "~/types";
 
 // states
-const showReplies = ref(false);
 
 const props = defineProps({
   comment: CommentEntity,
 });
 
-const { likeComment: callLikeCommentApi, fetchReplies } = usePostApi();
+const emit = defineEmits(["onReply"]);
+
+const { likeComment: callLikeCommentApi } = usePostApi();
 const { likeComment: updateCommentModalState } = useModalStore();
 const { likeComment: updateCommentOnPostStore } = usePostStore();
 
@@ -108,13 +95,7 @@ const likeComment = async () => {
     props.comment?.id!,
     props.comment?.liked
   );
-  updateCommentModalState(props.comment?.id!);
-  updateCommentOnPostStore(props.comment?.postId!, props.comment?.id!);
-};
-
-const toggleReply = async () => {
-  showReplies.value = !showReplies.value;
-
-  const res = await fetchReplies(props.comment?.id!);
+  // updateCommentModalState(props.comment?.id!);
+  // updateCommentOnPostStore(props.comment?.postId!, props.comment?.id!);
 };
 </script>

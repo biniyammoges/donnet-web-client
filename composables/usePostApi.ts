@@ -27,10 +27,15 @@ export default function usePostApi() {
           return resp
      }
 
+     const fetchReplies = async (commentId: string, filter: FilterQuery = { page: 1, limit: 20 }) => {
+          const resp = await useAxios<Paginate<CommentEntity>>(`api/comment/${commentId}/replies?${transformObjectToQuery(filter)}`)
+          return resp
+     }
+
      const likeComment = async (commentId: string, unlike = false) => {
           const resp = await useAxios<Paginate<PostEntity>>(`api/comment/${commentId}/like?${unlike ? 'unlike=true' : ''}`)
           return resp
      }
 
-     return { createPost, fetchPosts, likePost, createComment, fetchComments, likeComment }
+     return { createPost, fetchPosts, likePost, createComment, fetchComments, likeComment, fetchReplies }
 };
