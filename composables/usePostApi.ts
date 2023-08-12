@@ -1,4 +1,4 @@
-import { CommentEntity, CreateCommentDto, CreatePostDto, FilterQuery, Paginate, PostEntity } from 'types'
+import { CommentEntity, CreateCommentDto, CreatePostDto, FilterQuery, Paginate, PostEntity, PostLikeEntity } from 'types'
 import useAxios from '~/composables/useAxios'
 
 export default function usePostApi() {
@@ -13,7 +13,7 @@ export default function usePostApi() {
      }
 
      const likePost = async (postId: string, unlike = false) => {
-          const resp = await useAxios<Paginate<PostEntity>>(`api/post/${postId}/like?${unlike ? 'unlike=true' : ''}`)
+          const resp = await useAxios<PostLikeEntity>(`api/post/${postId}/like?${unlike ? 'unlike=true' : ''}`)
           return resp
      }
 
@@ -33,7 +33,7 @@ export default function usePostApi() {
      }
 
      const likeComment = async (commentId: string, unlike = false) => {
-          const resp = await useAxios<Paginate<PostEntity>>(`api/comment/${commentId}/like?${unlike ? 'unlike=true' : ''}`)
+          const resp = await useAxios<Comment>(`api/comment/${commentId}/like?${unlike ? 'unlike=true' : ''}`)
           return resp
      }
 

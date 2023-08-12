@@ -105,6 +105,7 @@
 <script setup lang="ts">
 // Imports
 import { storeToRefs } from "pinia";
+import usePostApi from "~/composables/usePostApi";
 
 // api composables
 const { createPost } = usePostApi();

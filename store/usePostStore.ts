@@ -49,23 +49,6 @@ export const usePostStore = defineStore('post-store', () => {
           }
      }
 
-     const likeComment = (postId: string, commentId: string, unlike = false) => {
-          const postIdx = posts.value.findIndex(p => p.id === postId);
-          if (postIdx > -1) {
-               const comments = posts.value[postIdx].comments ?? [];
-               const commentIdx = comments.findIndex(c => c.id === commentId);
 
-               if (commentIdx > -1) {
-                    comments[commentIdx].liked = !unlike
-
-                    posts.value[postIdx] = {
-                         ...posts.value[postIdx],
-                         comments
-                    }
-               }
-
-          }
-     }
-
-     return { posts, getPosts, addPost, setPosts, likePost, updateCommentCount, setComments, likeComment }
+     return { posts, getPosts, addPost, setPosts, likePost, updateCommentCount, setComments, }
 })

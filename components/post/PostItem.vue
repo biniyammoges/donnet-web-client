@@ -19,8 +19,8 @@
           >
             {{
               joinFirstCharacters(
-                post.creator?.firstName!,
-                post.creator?.lastName!
+                post.creator?.firstName,
+                post.creator?.lastName
               )
             }}
           </div>
@@ -63,10 +63,7 @@
           class="w-1/2 rounded-xl object-cover"
           :src="post.medias[1]?.file?.url"
         />
-        <div
-          class="w-1/2 flex flex-col gap-y-1"
-          v-if="post.medias?.length! > 2"
-        >
+        <div class="w-1/2 flex flex-col gap-y-1" v-if="post.medias?.length > 2">
           <img
             class="w-full h-1/2 rounded-xl object-cover"
             :src="post.medias[1]?.file?.url"
@@ -79,10 +76,10 @@
               alt=""
             />
             <div
-              v-if="post.medias?.length! > 3"
+              v-if="post.medias?.length > 3"
               class="text-white flex items-center justify-center absolute h-full w-full left-0 top-0 bg-[rgba(0,0,0,0.6)]"
             >
-              <p class="text-3xl">+{{ post.medias?.length! - 3 }}</p>
+              <p class="text-3xl">+{{ post.medias?.length - 3 }}</p>
             </div>
           </div>
         </div>

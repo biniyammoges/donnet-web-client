@@ -2,7 +2,7 @@
   <div class="flex items-start justify-center gap-x-1">
     <div class="min-h-screen pb-16 w-full max-w-[550px] px-3 sm:px-0">
       <Story />
-      <div v-if="!posts.length && postLoading" class="mt-4">
+      <div v-if="!posts?.length && postLoading" class="mt-4">
         <h1 class="text-2xl text-gray-600">Loading</h1>
       </div>
       <Post v-else />
@@ -61,7 +61,7 @@ const page = ref(1);
 const limit = ref(8);
 
 const { data, pending: postLoading, execute } = await fetchPosts();
-setPosts(data.value!);
+setPosts(data?.value!);
 
 const fetchOnScroll = async () => {
   const { data } = await fetchPosts({ page: page.value, limit: limit.value });

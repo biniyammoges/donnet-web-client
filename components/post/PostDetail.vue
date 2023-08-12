@@ -1,11 +1,11 @@
 <template>
   <BaseModal v-model="showPreviewPostModal" persistant>
     <div
-      class="relative bg-white rounded-xl max-h-[700px] overflow-y-hidden overflow-x-hidden h-full px-3 py-3 flex gap-x-3"
+      class="relative w-full md:w-auto bg-white rounded-xl md:max-h-[700px] overflow-y-auto md:overflow-hidden overflow-x-hidden h-full px-3 py-3 flex flex-col md:flex-row gap-3"
     >
       <div
         v-if="post?.medias?.length"
-        class="w-[700px] overflow-hidden rounded-lg bg-black relative flex items-center justify-center"
+        class="md:w-[700px] h-[450px] md:h-auto shrink-0 md:shrink overflow-hidden rounded-lg bg-black relative flex items-center justify-center"
       >
         <button
           v-if="hasPostManyImages"
@@ -29,7 +29,7 @@
       </div>
 
       <!-- Post detail section -->
-      <div class="relative pt-2 pb-24 pl-2 w-[430px] h-full">
+      <div class="relative pt-2 pb-24 pl-2 md:w-[440px] h-full">
         <div v-if="post" class="flex justify-between items-center mb-3">
           <!-- Creator -->
           <div class="creator">
@@ -67,7 +67,7 @@
                 }}</nuxt-link
               >
               <p class="text-gray-400 text-xs leading-5">
-                {{ dateToTimeAgo(new Date(post.createdAt!)) }}
+                {{ dateToTimeAgo(new Date(post?.createdAt)) }}
               </p>
             </div>
           </div>
@@ -77,7 +77,7 @@
             </button>
             <button
               @click="postModal.closePreviewPostModal"
-              class="text-gray-400 hover:text-gray-600 px-2 text-3xl"
+              class="fixed top-2 right-2 md:static text-gray-400 hover:text-gray-600 px-2 text-3xl"
             >
               <span class="i-mdi-close"></span>
             </button>
@@ -117,19 +117,21 @@
 
           <!-- comments -->
           <div class="mt-2">
-            <h1
+            <div
               v-if="commentLoading && !post?.comments?.length"
-              class="text-2xl text-gray-500"
+              class="flex items-center justify-center flex-col"
             >
-              Loading comments
-            </h1>
+              <img class="w-9" src="~/assets/images/loader.svg" alt="" />
+              <h1 class="text-gray-400">Loading comments..</h1>
+            </div>
             <CommentItem
+              @on-reply="onReply"
               v-for="comment of post?.comments ?? []"
               :key="comment.id"
               :comment="comment"
             />
             <div
-              v-if="!post?.comments?.length"
+              v-if="!commentLoading && !post?.comments?.length"
               class="flex flex-col items-center justify-center"
             >
               <h1 class="text-gray-500 text-lg flex items-center gap-x-1">
@@ -137,12 +139,18 @@
                 comments so far!
               </h1>
               <p class="text-sm text-gray-400">be the first one to comment!</p>
+              <base-button variant="primaryRevert">
+                <span class="i-mdi-reload mr-1"></span>
+                Reload</base-button
+              >
             </div>
           </div>
         </div>
 
         <!-- Add comment input -->
-        <div class="absolute left-0 -bottom-2 right-0 overflow-hidden">
+        <div
+          class="fixed md:absolute left-2 md:left-0 bottom-0 right-2 md:-bottom-2 md:right-0 overflow-hidden"
+        >
           <button
             class="absolute bottom-[18px] text-xl left-3 h-5 text-gray-400 hover:text-gray-600"
           >
@@ -151,8 +159,8 @@
           <textarea
             @input="handleTextAreaHeight"
             ref="textAreaRef"
-            class="bg-gray-50 resize-none w-full py-2 text-gray-600 max-h-[100px] outline-none transition-all px-9 border border-gray-300 rounded-lg"
-            :placeholder="`Write something about ${post?.creator?.firstName}'s post?`"
+            class="bg-gray-50 text-sm resize-none w-full py-2 text-gray-600 max-h-[100px] outline-none transition-all px-9 border border-gray-300 rounded-lg focus:border focus:border-blue-600"
+            :placeholder="`Write comment here...`"
             v-model="commentDto.text"
             rows="1"
           ></textarea>
@@ -171,7 +179,8 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { CreateCommentDto } from "types";
+import { CommentReplyEventDto, CreateCommentDto } from "types";
+import { useModalStore, usePostStore } from "~/store";
 
 const postModal = useModalStore();
 const { likePost, updateCommentCount, setComments } = usePostStore();
@@ -184,7 +193,6 @@ const commentDto = reactive<CreateCommentDto>({
   parentCommentId: "",
   postId: "",
 });
-const usernameToReply = ref<string | null>(null);
 const textAreaRef = ref<HTMLTextAreaElement | null>(null);
 const hasPostManyImages = computed(() => post.value?.medias?.length! > 1);
 const commentLoading = ref(false);
@@ -236,27 +244,30 @@ const backward = () => {
 const comment = async () => {
   const { data, error } = await createComment({
     ...commentDto,
-    postId: post.value?.id,
+    ...(!commentDto.parentCommentId && { postId: post.value?.id }),
   });
+
   if (data.value) {
-    updateCommentCount(post.value?.id!);
-    post.value!.commentCount! += 1;
-    post.value!.comments?.push(data.value);
+    if (commentDto.parentCommentId) {
+      postModal.addReply(commentDto.parentCommentId, data.value);
+    } else {
+      updateCommentCount(post.value?.id!);
+      post.value!.commentCount! += 1;
+      post.value!.comments?.push(data.value);
+    }
   }
 
+  // if there is no error which means request is successfull so inputs get creared
   if (!error.value) {
     commentDto.text = "";
     commentDto.parentCommentId = "";
-    usernameToReply.value = "";
   }
 };
 
 watchEffect(async () => {
   if (showPreviewPostModal.value && post.value?.id) {
     commentLoading.value = true;
-    const { data, error, pending, execute } = await fetchComments(
-      post.value?.id!
-    );
+    const { data, error, pending } = await fetchComments(post.value?.id!);
     commentLoading.value = false;
 
     if (data.value) {
@@ -265,6 +276,20 @@ watchEffect(async () => {
     }
   }
 });
+
+const onReply = async (e: CommentReplyEventDto) => {
+  commentDto.parentCommentId = e.commentId;
+  textAreaRef.value?.focus();
+
+  const words = commentDto.text.split(" ");
+  if (commentDto.text.startsWith("@")) {
+    words.splice(0, 1, `@${e.username}`);
+  } else {
+    words.splice(0, 0, `@${e.username}`);
+  }
+
+  commentDto.text = words.join(" ");
+};
 </script>
 
 <style scoped>

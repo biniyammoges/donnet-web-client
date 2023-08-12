@@ -1,69 +1,76 @@
 <template>
-  <div class="flex py-3">
+  <div class="flex items-start pt-2">
     <!-- Commentor Profile Detail -->
-    <nuxt-link to="/" class="avatar mr-1 block relative h-8 w-8 rounded-full">
-      <img
-        v-if="comment?.commentor?.avatar"
-        :src="comment.commentor.avatar.url"
-        alt="image"
-        class="h-7 w-7 rounded-full object-cover"
-      />
-      <div
-        v-else
-        class="w-7 h-7 text-sm rounded-full border text-gray-500 border-gray-500 flex items-center justify-center"
+    <div class="flex items-center">
+      <div class="h-[1px] bg-gray-400 mr-2 w-3 shrink-0 items-center"></div>
+
+      <nuxt-link
+        to="/"
+        class="avatar shrink-0 mr-1 block relative h-8 w-8 rounded-full"
       >
-        {{
-          joinFirstCharacters(
-            comment?.commentor?.firstName,
-            comment?.commentor?.lastName
-          )
-        }}
-      </div>
-      <span
-        class="hidden h-2 w-2 top-1 right-1 absolute rounded-full bg-green-500"
-      ></span>
-    </nuxt-link>
+        <img
+          v-if="reply?.commentor?.avatar"
+          :src="reply.commentor.avatar.url"
+          alt="image"
+          class="h-7 w-7 rounded-full object-cover"
+        />
+        <div
+          v-else
+          class="w-7 h-7 text-sm rounded-full border text-gray-500 border-gray-500 flex items-center justify-center"
+        >
+          {{
+            joinFirstCharacters(
+              reply?.commentor?.firstName,
+              reply?.commentor?.lastName
+            )
+          }}
+        </div>
+        <span
+          class="hidden h-2 w-2 top-1 right-1 absolute rounded-full bg-green-500"
+        ></span>
+      </nuxt-link>
+    </div>
 
     <div>
       <!-- Commentor name and date the comment created -->
       <div class="flex items-center gap-x-2">
         <nuxt-link
           to="/profile"
-          class="text-gray-500 hover:underline text-base"
+          class="text-gray-600 hover:underline text-base"
           >{{
-            comment?.commentor?.firstName + " " + comment?.commentor?.lastName
+            reply?.commentor?.firstName + " " + reply?.commentor?.lastName
           }}</nuxt-link
         >
         <span class="text-xs text-gray-400">{{
-          dateToTimeAgo(new Date(comment?.createdAt!))
+          dateToTimeAgo(new Date(reply?.createdAt))
         }}</span>
       </div>
 
-      <!-- Comment text -->
-      <p class="text-gray-500">
-        {{ comment?.text }}
+      <!-- Reply text -->
+      <p class="text-gray-500 pr-5">
+        {{ reply?.text }}
       </p>
 
-      <!-- Comments Actions -->
+      <!-- Replies Actions -->
       <div class="flex items-center gap-x-3">
         <button
           @click="likeComment"
           class="flex items-center text-sm py-[7px] gap-x-[5px]"
         >
           <span
-            :class="[comment?.liked ? 'i-mdi-heart ' : 'i-mdi-heart-outline']"
+            :class="[reply?.liked ? 'i-mdi-heart ' : 'i-mdi-heart-outline']"
             class="text-xl text-blue-600"
           ></span>
-          <span class="text-gray-500" v-if="comment?.likeCount"
-            >{{ comment?.likeCount }} likes</span
+          <span class="text-gray-500" v-if="reply?.likeCount"
+            >{{ reply?.likeCount }} likes</span
           >
         </button>
 
         <button
           @click="
-            emit('onReply', {
-              username: comment?.commentor?.username,
-              parentid: comment?.parentCommentId,
+            emit('on-reply', {
+              username: reply?.commentor?.username,
+              commentId: reply?.parentCommentId,
             })
           "
           class="flex items-center text-sm py-1 gap-x-[5px] text-gray-500 hover:text-blue-700"
@@ -76,26 +83,28 @@
 </template>
 
 <script setup lang="ts">
-import { CommentEntity } from "~/types";
+import { CommentEntity, CommentReplyEvent } from "~/types";
 
 // states
 
 const props = defineProps({
-  comment: CommentEntity,
+  reply: {
+    type: CommentEntity,
+    required: true,
+  },
 });
 
-const emit = defineEmits(["onReply"]);
+const emit = defineEmits<CommentReplyEvent>();
 
-const { likeComment: callLikeCommentApi } = usePostApi();
-const { likeComment: updateCommentModalState } = useModalStore();
-const { likeComment: updateCommentOnPostStore } = usePostStore();
+const { likeComment: likeReplyApi } = usePostApi();
+const { likeReply: updateReplyLikeCountOnStore } = useModalStore();
 
 const likeComment = async () => {
-  const { data } = await callLikeCommentApi(
-    props.comment?.id!,
-    props.comment?.liked
+  updateReplyLikeCountOnStore(
+    props.reply?.parentCommentId!,
+    props.reply.id!,
+    props.reply.liked
   );
-  // updateCommentModalState(props.comment?.id!);
-  // updateCommentOnPostStore(props.comment?.postId!, props.comment?.id!);
+  await likeReplyApi(props.reply?.id!, props.reply?.liked);
 };
 </script>
