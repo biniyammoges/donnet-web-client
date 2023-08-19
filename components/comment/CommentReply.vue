@@ -2,8 +2,6 @@
   <div class="flex items-start pt-2">
     <!-- Commentor Profile Detail -->
     <div class="flex items-center">
-      <div class="h-[1px] bg-gray-400 mr-2 w-3 shrink-0 items-center"></div>
-
       <nuxt-link
         to="/"
         class="avatar shrink-0 mr-1 block relative h-8 w-8 rounded-full"
@@ -83,13 +81,14 @@
 </template>
 
 <script setup lang="ts">
+import { PropType } from "vue";
 import { CommentEntity, CommentReplyEvent } from "~/types";
 
 // states
 
 const props = defineProps({
   reply: {
-    type: CommentEntity,
+    type: Object as PropType<CommentEntity>,
     required: true,
   },
 });

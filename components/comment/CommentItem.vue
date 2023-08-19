@@ -113,6 +113,7 @@
 </template>
 
 <script setup lang="ts">
+import { PropType } from "vue";
 import { CommentEntity, CommentReplyEvent } from "~/types";
 
 // states
@@ -120,7 +121,7 @@ const showReplies = ref(false);
 
 const props = defineProps({
   comment: {
-    type: CommentEntity,
+    type: Object as PropType<CommentEntity>,
     required: true,
   },
 });

@@ -1,7 +1,7 @@
 <template>
   <BaseModal v-model="showPreviewPostModal" persistant>
     <div
-      class="relative w-full md:w-auto bg-white rounded-xl md:max-h-[700px] overflow-y-auto md:overflow-hidden overflow-x-hidden h-full px-3 py-3 flex flex-col md:flex-row gap-3"
+      class="relative w-full md:w-auto bg-white rounded-xl md:max-h-[700px] overflow-y-auto md:overflow-hidden overflow-x-hidden h-full flex flex-col md:flex-row gap-3"
     >
       <div
         v-if="post?.medias?.length"
@@ -29,8 +29,8 @@
       </div>
 
       <!-- Post detail section -->
-      <div class="relative pt-2 pb-24 pl-2 md:w-[440px] h-full">
-        <div v-if="post" class="flex justify-between items-center mb-3">
+      <div class="relative py-2 pl-4 md:w-[440px] h-full">
+        <div v-if="post" class="flex justify-between items-center py-2">
           <!-- Creator -->
           <div class="creator">
             <nuxt-link
@@ -84,7 +84,7 @@
           </div>
         </div>
 
-        <div class="relative overflow-y-auto h-full">
+        <div class="relative md:overflow-y-auto h-full">
           <!-- Captions -->
           <p v-if="post?.caption" class="text-gray-500">
             {{ post.caption }}
@@ -144,32 +144,32 @@
                 Reload</base-button
               >
             </div>
+            <div class="h-28"></div>
           </div>
         </div>
 
         <!-- Add comment input -->
-        <div
-          class="fixed md:absolute left-2 md:left-0 bottom-0 right-2 md:-bottom-2 md:right-0 overflow-hidden"
-        >
+        <div class="fixed md:absolute left-2 bottom-0 right-2 overflow-hidden">
           <button
-            class="absolute bottom-[18px] text-xl left-3 h-5 text-gray-400 hover:text-gray-600"
+            class="absolute bottom-[19px] text-xl left-3 h-5 text-gray-500 hover:text-gray-600"
           >
             <span class="i-mdi-emoji-outline"></span>
           </button>
           <textarea
+            data-autoresize
             @input="handleTextAreaHeight"
             ref="textAreaRef"
-            class="bg-gray-50 text-sm resize-none w-full py-2 text-gray-600 max-h-[100px] outline-none transition-all px-9 border border-gray-300 rounded-lg focus:border focus:border-blue-600"
+            rows="1"
+            class="bg-[#F0F2F5] text-sm resize-none w-full py-3 text-gray-600 max-h-[100px] min-h-[45px] outline-none transition-all px-9 border border-white rounded-lg focus:border focus:border-blue-600 placeholder:text-gray-500"
             :placeholder="`Write comment here...`"
             v-model="commentDto.text"
-            rows="1"
           ></textarea>
 
           <button
             @click="comment"
-            class="absolute bottom-3 text-sm px-4 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white right-1 h-8"
+            class="absolute bottom-4 text-sm rounded-full bg-blue-500 hover:bg-blue-600 text-white right-2 h-7 w-7 items-center justify-center flex"
           >
-            comment
+            <span class="i-mdi-send"></span>
           </button>
         </div>
       </div>
@@ -198,8 +198,9 @@ const hasPostManyImages = computed(() => post.value?.medias?.length! > 1);
 const commentLoading = ref(false);
 
 // Handles textarea height as user enter the text
-const handleTextAreaHeight = () => {
-  const scrollHeight = textAreaRef.value?.scrollHeight;
+const handleTextAreaHeight = (e: Event) => {
+  const scrollHeight = textAreaRef.value?.scrollHeight ?? 0;
+  textAreaRef.value!.style.height = "auto";
   textAreaRef.value!.style.height = scrollHeight + "px";
 };
 
@@ -282,12 +283,8 @@ const onReply = async (e: CommentReplyEventDto) => {
   textAreaRef.value?.focus();
 
   const words = commentDto.text.split(" ");
-  if (commentDto.text.startsWith("@")) {
-    words.splice(0, 1, `@${e.username}`);
-  } else {
-    words.splice(0, 0, `@${e.username}`);
-  }
-
+  const hasAtChar = commentDto.text.startsWith("@");
+  words.splice(0, hasAtChar ? 1 : 0, `@${e.username}`);
   commentDto.text = words.join(" ");
 };
 </script>
