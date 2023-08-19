@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="h-[42px] my-2"
-    :class="{
-      'h-[28px]': size === 'small',
-    }"
-  >
+  <div class="my-2" :class="[size === 'small' ? 'h-[28px]' : 'h-[42px]']">
     <button
       :disabled="disabled"
       :type="type"
@@ -12,7 +7,7 @@
       :class="{
         'bg-blue-600 text-white hover:bg-blue-600 active:bg-blue-700':
           variant === 'primary',
-        'bg-blue-50 text-blue-700': variant === 'primaryRevert',
+        'bg-blue-50 text-blue-900': variant === 'primaryRevert',
         'bg-yellow-500 text-gray-950': variant === 'warning',
         'bg-yellow-50 text-yellow-700': variant === 'warningRevert',
         'bg-red-600 text-white': variant === 'error',
