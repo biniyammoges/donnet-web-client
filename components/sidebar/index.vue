@@ -52,16 +52,23 @@
         </div>
 
         <div class="mb-3">
-          <sidebar-button to="/profile" :title="getFirstAndLastName">
+          <sidebar-button
+            :to="`/u/${user?.username}`"
+            :title="getFirstAndLastName"
+          >
             <template #icon>
-              <img
-                v-if="user?.avatar?.url"
-                :src="user.avatar.url"
-                alt="image"
-                class="h-8 w-8 rounded-full object-cover"
-              />
-              <div v-else class="text-base">
-                {{ joinFirstCharacters(user?.firstName!, user?.lastName!) }}
+              <div
+                class="bg-gray-100 lg:bg-transparent w-full lg:w-auto h-full lg:h-auto rounded-full flex items-center justify-center"
+              >
+                <img
+                  v-if="user?.avatar?.url"
+                  :src="user.avatar.url"
+                  alt="image"
+                  class="h-8 w-8 rounded-full object-cover"
+                />
+                <div v-else class="text-base">
+                  {{ joinFirstCharacters(user?.firstName, user?.lastName) }}
+                </div>
               </div>
             </template>
           </sidebar-button>

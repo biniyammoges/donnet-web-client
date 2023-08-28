@@ -1,5 +1,5 @@
 <template>
-  <div class="my-3">
+  <div>
     <label :for="name" v-if="label" class="text-gray-500 text-base"
       >{{ label }}<span v-if="requried"> *</span></label
     >

@@ -1,11 +1,11 @@
 <template>
   <BaseModal v-model="showPreviewPostModal" persistant>
     <div
-      class="relative w-full md:w-auto bg-white rounded-xl md:max-h-[700px] overflow-y-auto md:overflow-hidden overflow-x-hidden h-full flex flex-col md:flex-row gap-3"
+      class="relative md:mx-3 w-full md:w-auto bg-white md:rounded-xl md:max-h-[700px] overflow-y-auto md:overflow-hidden overflow-x-hidden h-full flex flex-col md:flex-row gap-3"
     >
       <div
         v-if="post?.medias?.length"
-        class="md:w-[700px] h-[450px] md:h-auto shrink-0 md:shrink overflow-hidden rounded-lg bg-black relative flex items-center justify-center"
+        class="md:w-[700px] h-[450px] md:h-auto shrink-0 md:shrink overflow-hidden md:rounded-lg bg-black relative flex items-center justify-center"
       >
         <button
           v-if="hasPostManyImages"

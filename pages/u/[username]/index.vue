@@ -33,9 +33,17 @@
               <h3 class="text-gray-600 text-lg">{{ user?.email }}</h3>
               <h4 class="text-base text-gray-500">@{{ user?.username }}</h4>
             </div>
-            <BaseButton size="small" class="self-auto"
+            <BaseButton
+              @click="showEditProfileModal = true"
+              size="small"
+              class="self-auto"
               ><span class="i-mdi-edit-box-outline mr-1"></span> Edit
             </BaseButton>
+
+            <!-- Edit Profile Modal -->
+            <BaseModal v-model="showEditProfileModal">
+              <ProfileEditForm />
+            </BaseModal>
           </div>
 
           <div class="mt-5">
@@ -102,4 +110,5 @@ import { storeToRefs } from "pinia";
 // states
 const { user } = storeToRefs(useAuthStore());
 const showFollowerModal = ref(false);
+const showEditProfileModal = ref(false);
 </script>

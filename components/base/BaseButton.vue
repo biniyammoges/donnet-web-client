@@ -1,5 +1,5 @@
 <template>
-  <div class="my-2" :class="[size === 'small' ? 'h-[28px]' : 'h-[42px]']">
+  <div :class="[size === 'small' ? 'h-[28px]' : 'h-[42px]']">
     <button
       :disabled="disabled"
       :type="type"

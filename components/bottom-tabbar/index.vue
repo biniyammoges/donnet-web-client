@@ -37,7 +37,10 @@
       </div>
 
       <div class="">
-        <bottom-tabbar-button to="/profile" :title="getFirstAndLastName">
+        <bottom-tabbar-button
+          :to="`/u/${user?.username}`"
+          :title="getFirstAndLastName"
+        >
           <template #icon>
             <span class="i-mdi-user-outline"></span>
           </template>
@@ -48,10 +51,11 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import { useAuthStore } from "~/store/useAuthStore";
-const { getUser, destroyAuthData } = useAuthStore();
+const { user } = storeToRefs(useAuthStore());
 
 const getFirstAndLastName = computed(
-  () => `${getUser?.firstName} ${getUser?.lastName}`
+  () => `${user.firstName} ${user.lastName}`
 );
 </script>
