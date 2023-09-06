@@ -20,8 +20,12 @@
         </div>
 
         <div class="mb-3">
-          <sidebar-button to="/search" title="Search">
-            <template #icon><span class="i-mdi-search"></span> </template>
+          <sidebar-button
+            tag="button"
+            title="Search"
+            @action="setCollapsed(true)"
+          >
+            <template #icon><span class="i-mdi-search"></span></template>
           </sidebar-button>
         </div>
 
@@ -88,8 +92,14 @@
 <script setup lang="ts">
 import { useModalStore } from "~/store/useModalStore";
 import { useAuthStore } from "~/store/useAuthStore";
+import { useSidebarStore } from "~/store/useSidebarStore";
+import { storeToRefs } from "pinia";
+
 const { getUser: user, destroyAuthData } = useAuthStore();
 const { openCreatePostModal } = useModalStore();
+
+const { setCollapsed } = useSidebarStore();
+// const {} = storeToRefs(sidebarStore);
 
 const getFirstAndLastName = computed(
   () => `${user?.firstName} ${user?.lastName}`
