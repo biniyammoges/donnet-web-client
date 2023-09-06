@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { AuthResponse } from "types";
 import { User } from "types";
+import { FileEntity } from "types/entities/file.entity";
 
 export const useAuthStore = defineStore('d', () => {
      // retrieve tokens from cookie when pages refreshs
@@ -33,12 +34,17 @@ export const useAuthStore = defineStore('d', () => {
           user.value = data
      }
 
+     const setAvatar = (avatar: FileEntity) => {
+          user.value!.avatar = avatar
+     }
+
      return {
           tokens,
           user,
           getUser,
           getTokens,
           setUser,
+          setAvatar,
           storeAuthTokens,
           destroyAuthData,
      }

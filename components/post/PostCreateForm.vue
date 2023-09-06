@@ -28,7 +28,7 @@
             v-else
             class="w-9 h-9 rounded-full border text-gray-500 border-gray-500 flex items-center justify-center"
           >
-            {{ joinFirstCharacters(user?.firstName!, user?.lastName!) }}
+            {{ joinFirstCharacters(user?.firstName, user?.lastName) }}
           </div>
           <p class="ml-2 text-blue-900 text-lg">
             {{ `${user?.firstName} ${user?.lastName}` }}

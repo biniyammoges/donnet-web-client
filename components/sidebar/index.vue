@@ -58,7 +58,7 @@
           >
             <template #icon>
               <div
-                class="bg-gray-100 lg:bg-transparent w-full lg:w-auto h-full lg:h-auto rounded-full flex items-center justify-center"
+                class="lg:-ml-2 bg-gray-100 lg:bg-transparent w-full lg:w-auto h-full lg:h-auto rounded-full flex items-center justify-center"
               >
                 <img
                   v-if="user?.avatar?.url"

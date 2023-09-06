@@ -1,25 +1,43 @@
 <template>
   <div class="w-full p-5">
     <div class="flex gap-x-7">
-      <div class="relative shrink-0 avatar w-20 h-20 rounded-full">
+      <div
+        class="relative shrink-0 avatar w-20 h-20 border border-yellow-500 rounded-full"
+      >
+        <div
+          v-if="uploading"
+          class="absolute flex items-center justify-center h-full w-full rounded-full z-30 bg-opacity-30 bg-black top-0 left-0"
+        >
+          <img width="50" src="~/assets/images/spin.svg" alt="spin" />
+        </div>
         <img
-          v-if="user?.avatar"
-          :src="user.avatar.url"
+          v-if="avatarPreview || user?.avatar"
+          :src="avatarPreview || user?.avatar?.url"
           alt="image"
           class="h-full w-full rounded-full object-cover"
         />
         <div
           v-else
-          class="w-full h-full rounded-full border text-gray-500 border-gray-500 text-2xl flex items-center justify-center"
+          class="w-full h-full rounded-full text-yellow-800 text-2xl flex items-center justify-center"
         >
-          {{ joinFirstCharacters(user?.firstName, user?.lastName) }}
+          {{ joinFirstCharacters(user?.firstName ?? "", user?.lastName ?? "") }}
         </div>
 
-        <button
-          class="absolute bottom-0 right-0 bg-yellow-300 flex items-center justify-center text-gray-900 w-6 h-6 rounded-full border border-yellow-500"
-        >
-          <span class="i-mdi-camera"> </span>
-        </button>
+        <!-- avatar upload button -->
+        <div class="absolute bottom-0 right-0">
+          <input
+            @change="handleFileInput"
+            type="file"
+            id="file-input"
+            class="hidden"
+            accept="image/*"
+          />
+          <label
+            class="cursor-pointer bg-yellow-300 flex items-center justify-center text-gray-900 w-6 h-6 rounded-full border border-yellow-500"
+            for="file-input"
+            ><span class="i-mdi-camera"></span
+          ></label>
+        </div>
       </div>
 
       <!-- user detail -->
@@ -108,7 +126,34 @@
 import { storeToRefs } from "pinia";
 
 // states
-const { user } = storeToRefs(useAuthStore());
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 const showFollowerModal = ref(false);
 const showEditProfileModal = ref(false);
+const avatarPreview = ref("");
+const uploading = ref(false);
+
+// composables
+const { uploadFile } = useFileApi();
+const { uploadUserAvatae } = useUserApi();
+
+// methods
+const handleFileInput = async (e: Event) => {
+  const inpt = e.target as HTMLInputElement;
+  const file = inpt.files![0];
+
+  const previewUrl = URL.createObjectURL(file);
+  avatarPreview.value = previewUrl;
+
+  uploading.value = true;
+  const { data } = await uploadFile(file);
+
+  if (data.value) {
+    authStore.setAvatar(data.value);
+    const { data: userData } = await uploadUserAvatae(data.value?.id!);
+    avatarPreview.value = "";
+  }
+
+  uploading.value = false;
+};
 </script>
