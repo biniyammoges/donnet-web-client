@@ -58,6 +58,14 @@ const updateScreenWidth = () => {
   screenWidth.value = window.innerWidth;
 };
 
+watch(screenWidth, () => {
+  if (screenWidth.value >= 1024) {
+    sidebarStore.setCollapsed(false);
+  } else {
+    sidebarStore.setCollapsed(true);
+  }
+});
+
 onMounted(() => {
   updateScreenWidth();
   window.addEventListener("resize", updateScreenWidth);
