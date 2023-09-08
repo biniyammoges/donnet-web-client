@@ -1,20 +1,20 @@
 <template>
   <div class="flex items-center justify-start flex-wrap gap-2">
-    <div class="post" v-for="p of posts" :key="p">
+    <div class="post" v-for="post of posts" :key="post?.id">
       <div
-        class="flex justify-center items-center bg-gray-50 h-full p-5 text-center"
-        v-if="p % 2 != 0"
+        class="flex justify-center items-center bg-blue-100 h-full p-5 text-center"
+        v-if="!post.medias?.length"
       >
-        <p class="line-clamp-3 text-gray-900 text-xl">
-          We reward success at each stage in your Upwork journey with a badge
-          that helps you win more work from top clients. Get and maintain a
-          badge by consistently delivering great results for your clients. Learn
-          more
+        <p class="line-clamp-4 text-gray-900 text-xl">
+          {{ post?.caption }}
         </p>
       </div>
       <template v-else>
         <div class="overlay"></div>
-        <img src="~/assets/images/image-1.jpg" alt="ss" />
+        <img
+          :src="post.medias[0].file?.url"
+          :alt="post.creator?.firstName + '`s post'"
+        />
       </template>
 
       <!-- like and comment count -->
@@ -22,18 +22,18 @@
         class="like flex absolute bottom-2 left-3 z-30 gap-x-3 transition-opacity opacity-0 invisible"
       >
         <p
-          :class="[p % 2 === 0 ? 'text-white' : 'text-gray-600']"
+          :class="[post?.medias?.length ? 'text-white' : 'text-gray-600']"
           class="flex items-center gap-x-1"
         >
           <span class="i-mdi-heart-outline"></span>
-          14k
+          {{ post?.likeCount }}
         </p>
         <p
-          :class="[p % 2 === 0 ? 'text-white' : 'text-gray-600']"
+          :class="[post?.medias?.length ? 'text-white' : 'text-gray-600']"
           class="flex items-center gap-x-1"
         >
           <span class="i-mdi-comment-outline"></span>
-          1.2k
+          {{ post?.commentCount }}
         </p>
       </div>
     </div>
@@ -41,14 +41,17 @@
 </template>
 
 <script lang="ts" setup>
-const posts = [1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4];
+import { PostEntity } from "types";
+import { PropType } from "vue";
 
-onMounted(() => console.log("Mounted"));
+const props = defineProps({
+  posts: Array as PropType<PostEntity[]>,
+});
 </script>
 
 <style scoped>
 .post {
-  @apply relative max-w-[270px] w-full h-[163px] rounded-xl overflow-hidden  cursor-pointer border-[0.5px] border-gray-500;
+  @apply relative max-w-[270px] w-full h-[170px] rounded-xl overflow-hidden  cursor-pointer;
 }
 
 .overlay {
@@ -64,7 +67,7 @@ onMounted(() => console.log("Mounted"));
   );
 }
 
-.post:hover > div {
+.post:hover > .like {
   @apply opacity-100 visible;
 }
 </style>

@@ -1,6 +1,8 @@
 <template>
   <div class="w-full p-5">
-    <div class="flex gap-x-7">
+    <!-- user detail -->
+    <ProfileUserSkeleton v-if="userLoading" />
+    <div v-else class="flex gap-x-7">
       <div
         class="relative shrink-0 avatar w-20 h-20 border border-yellow-500 rounded-full"
       >
@@ -11,8 +13,8 @@
           <img width="50" src="~/assets/images/spin.svg" alt="spin" />
         </div>
         <img
-          v-if="avatarPreview || user?.avatar"
-          :src="avatarPreview || user?.avatar?.url"
+          v-if="avatarPreview || foundUser?.avatar"
+          :src="avatarPreview || foundUser?.avatar?.url"
           alt="image"
           class="h-full w-full rounded-full object-cover"
         />
@@ -20,11 +22,19 @@
           v-else
           class="w-full h-full rounded-full text-yellow-800 text-2xl flex items-center justify-center"
         >
-          {{ joinFirstCharacters(user?.firstName ?? "", user?.lastName ?? "") }}
+          {{
+            joinFirstCharacters(
+              foundUser?.firstName ?? "",
+              foundUser?.lastName ?? ""
+            )
+          }}
         </div>
 
         <!-- avatar upload button -->
-        <div class="absolute bottom-0 right-0">
+        <div
+          class="absolute bottom-0 right-0"
+          v-if="user?.username === username"
+        >
           <input
             @change="handleFileInput"
             type="file"
@@ -46,20 +56,31 @@
           <div class="flex items-center gap-x-6">
             <div>
               <h1 class="text-xl text-gray-700">
-                {{ user?.firstName + " " + user?.lastName }}
+                {{ foundUser?.firstName + " " + foundUser?.lastName }}
               </h1>
-              <h3 class="text-gray-600 text-lg">{{ user?.email }}</h3>
-              <h4 class="text-base text-gray-500">@{{ user?.username }}</h4>
+              <h3 class="text-gray-600 text-lg">{{ foundUser?.email }}</h3>
+              <h4 class="text-base text-gray-500">
+                @{{ foundUser?.username }}
+              </h4>
             </div>
-            <BaseButton
-              @click="showEditProfileModal = true"
-              size="small"
-              class="self-auto"
-              ><span class="i-mdi-edit-box-outline mr-1"></span> Edit
-            </BaseButton>
+            <div class="flex items-center gap-x-2">
+              <BaseButton
+                v-if="user?.username === username"
+                @click="showEditProfileModal = true"
+                size="small"
+                class="self-auto"
+                ><span class="i-mdi-edit-box-outline mr-1"></span> Edit
+              </BaseButton>
+              <BaseButton v-else size="small" class="self-auto">
+                Follow
+              </BaseButton>
+            </div>
 
             <!-- Edit Profile Modal -->
-            <BaseModal v-model="showEditProfileModal">
+            <BaseModal
+              v-if="user?.username === username"
+              v-model="showEditProfileModal"
+            >
               <ProfileEditForm />
             </BaseModal>
           </div>
@@ -67,29 +88,31 @@
           <div class="mt-5">
             <div class="flex gap-x-8">
               <!-- Followers -->
-              <div>
+              <div class="text-center">
                 <h1
                   @click="showFollowerModal = true"
                   class="leading-6 text-xl font-bold text-gray-500 hover:underline hover:text-blue-600 cursor-pointer"
                 >
-                  14.2k
+                  {{ foundUser?.followerCount ?? 0 }}
                 </h1>
                 <p class="text-sm text-gray-600">Followers</p>
               </div>
 
               <!-- Followings -->
-              <div>
+              <div class="text-center">
                 <h1
                   class="leading-6 text-xl font-bold text-gray-500 hover:underline hover:text-blue-600 cursor-pointer"
                 >
-                  1.2k
+                  {{ foundUser?.followingCount ?? 0 }}
                 </h1>
                 <p class="text-sm text-gray-600">Followings</p>
               </div>
 
               <!-- Posts -->
-              <div>
-                <h1 class="leading-6 text-xl font-bold text-gray-500">192</h1>
+              <div class="text-center">
+                <h1 class="leading-6 text-xl font-bold text-gray-500">
+                  {{ foundUser?.postCount ?? 0 }}
+                </h1>
                 <p class="text-sm text-gray-600">Posts</p>
               </div>
             </div>
@@ -101,20 +124,19 @@
           </BaseModal>
         </div>
         <!-- bios -->
-        <p class="text-gray-500 max-w-[400px] mt-4">
-          I am positive person, I love to travel and eat, and I love sleep as
-          well alpha programmer and gammer
+        <p v-if="foundUser?.bio" class="text-gray-500 max-w-[400px] mt-4">
+          {{ foundUser?.bio }}
         </p>
       </div>
     </div>
 
     <!-- main -->
     <div class="mt-7 bg-white p-4 rounded-3xl h-screen">
-      <BaseTab :tabs="['92 Posts', '12 Saved']">
+      <BaseTab :tabs="[`${foundUser?.postCount ?? 0} Posts`, `12 Saved`]">
         <template #tab-1>
-          <ProfilePostsTabView />
+          <ProfilePostsTabView :posts="posts" />
         </template>
-        <template #tab-2>
+        <template v-if="user?.username === username" #tab-2>
           <h1>Saved</h1>
         </template>
       </BaseTab>
@@ -124,6 +146,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
+import { PostEntity, User } from "types";
 
 // states
 const authStore = useAuthStore();
@@ -133,9 +156,19 @@ const showEditProfileModal = ref(false);
 const avatarPreview = ref("");
 const uploading = ref(false);
 
+const foundUser = ref<User>();
+const posts = ref<PostEntity[]>([]);
+const username = ref("");
+
+const userLoading = ref(true);
+const postLoading = ref(false);
+
 // composables
 const { uploadFile } = useFileApi();
-const { uploadUserAvatae } = useUserApi();
+const { uploadUserAvatar, findByUsername } = useUserApi();
+const { fetchPosts } = usePostApi();
+const route = useRoute();
+const router = useRouter();
 
 // methods
 const handleFileInput = async (e: Event) => {
@@ -150,10 +183,44 @@ const handleFileInput = async (e: Event) => {
 
   if (data.value) {
     authStore.setAvatar(data.value);
-    const { data: userData } = await uploadUserAvatae(data.value?.id!);
+    await uploadUserAvatar(data.value?.id!);
     avatarPreview.value = "";
   }
 
   uploading.value = false;
 };
+
+const callPostApi = async () => {
+  postLoading.value = true;
+  const { data } = await fetchPosts({ username: username.value });
+  postLoading.value = false;
+
+  if (data.value?.data) {
+    posts.value = data.value?.data;
+  }
+};
+
+const callUserApi = async () => {
+  userLoading.value = true;
+  const { data, error } = await findByUsername(username.value);
+  userLoading.value = false;
+
+  if (
+    error.value?.data &&
+    error.value?.data?.message === `No user with username ${username.value}`
+  ) {
+    router.push("/page-not-found");
+  }
+
+  if (data.value) {
+    foundUser.value = data.value;
+  }
+};
+
+onMounted(async () => {
+  username.value = (route.params?.username as string) ?? "";
+
+  await nextTick();
+  await Promise.all([callPostApi(), callUserApi()]);
+});
 </script>

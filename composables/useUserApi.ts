@@ -1,3 +1,4 @@
+import { User } from 'types'
 import { FileEntity } from 'types/entities/file.entity'
 import useAxios from '~/composables/useAxios'
 
@@ -8,11 +9,16 @@ export default function useUserApi() {
           return resp
      }
 
-     const uploadUserAvatae = async (fileId: string) => {
+     const uploadUserAvatar = async (fileId: string) => {
           const resp = await useAxios<FileEntity>('/api/user/upload/avatar',
                { method: 'post', body: { fileId } });
           return resp
      }
 
-     return { validateUsername, uploadUserAvatae }
+     const findByUsername = async (username: string) => {
+          const resp = await useAxios<User>(`/api/user/find/${username}`);
+          return resp
+     }
+
+     return { validateUsername, uploadUserAvatar, findByUsername }
 };

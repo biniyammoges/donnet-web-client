@@ -15,6 +15,9 @@ export class User extends BaseEntity {
      avatar?: File;
      avatarId?: string;
      birthDate?: Date;
+     postCount?: number
+     followerCount?: number
+     followingCount?: number
 
      constructor(data?: Partial<User>) {
           super()

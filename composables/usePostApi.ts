@@ -7,7 +7,7 @@ export default function usePostApi() {
           return resp
      }
 
-     const fetchPosts = async (filter: FilterQuery = { page: 1, limit: 20 }) => {
+     const fetchPosts = async (filter: FilterQuery & { username?: string } = { page: 1, limit: 20 }) => {
           const resp = await useAxios<Paginate<PostEntity>>(`api/post/retrieve/feed?${transformObjectToQuery(filter)}`)
           return resp
      }
