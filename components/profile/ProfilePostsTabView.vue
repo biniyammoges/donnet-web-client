@@ -1,5 +1,6 @@
 <template>
   <div class="flex items-center justify-start flex-wrap gap-2">
+    <h1 v-if="!posts?.length" class="text-xl text-gray-600">No posts so far</h1>
     <div class="post" v-for="post of posts" :key="post?.id">
       <div
         class="flex justify-center items-center bg-blue-100 h-full p-5 text-center"
@@ -18,9 +19,7 @@
       </template>
 
       <!-- like and comment count -->
-      <div
-        class="like flex absolute bottom-2 left-3 z-30 gap-x-3 transition-opacity opacity-0 invisible"
-      >
+      <div class="like flex absolute bottom-2 left-3 z-30 gap-x-3">
         <p
           :class="[post?.medias?.length ? 'text-white' : 'text-gray-600']"
           class="flex items-center gap-x-1"
@@ -51,7 +50,7 @@ const props = defineProps({
 
 <style scoped>
 .post {
-  @apply relative max-w-[270px] w-full h-[170px] rounded-xl overflow-hidden  cursor-pointer;
+  @apply relative max-w-[270px] w-full h-[175px] rounded-xl overflow-hidden  cursor-pointer;
 }
 
 .overlay {
@@ -65,9 +64,5 @@ const props = defineProps({
     rgba(0, 0, 0, 0.4),
     rgba(0, 0, 0, 0.6)
   );
-}
-
-.post:hover > .like {
-  @apply opacity-100 visible;
 }
 </style>

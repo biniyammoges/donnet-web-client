@@ -2,6 +2,7 @@
   <div class="">
     <!-- tabs -->
     <div
+      v-if="tabs?.length > 1"
       class="inline-flex h-[44px] p-1 border border-gray-300 rounded-full w-auto items-center"
     >
       <button
@@ -21,7 +22,7 @@
 
     <!-- tab pages -->
     <template v-for="(tab, idx) of tabs" :key="idx">
-      <div v-if="idx === activeTabIdx" class="mt-4">
+      <div v-if="idx === activeTabIdx" :class="[tabs.length > 1 ? 'mt-4' : '']">
         <slot :name="`tab-${idx + 1}`"></slot>
       </div>
     </template>

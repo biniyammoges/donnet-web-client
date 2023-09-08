@@ -71,9 +71,24 @@
                 class="self-auto"
                 ><span class="i-mdi-edit-box-outline mr-1"></span> Edit
               </BaseButton>
-              <BaseButton v-else size="small" class="self-auto">
-                Follow
-              </BaseButton>
+              <div v-else class="flex flex-col items-center gap-y-2">
+                <BaseButton
+                  :loading="true"
+                  @click="manageFollow"
+                  :variant="!foundUser?.following ? 'primary' : 'primaryRevert'"
+                  size="small"
+                  class="self-auto"
+                  ><span class="i-mdi-account mr-1"></span>
+                  {{ foundUser?.following ? "Unfollow" : "Follow" }}
+                </BaseButton>
+                <BaseButton
+                  variant="warningRevert"
+                  size="small"
+                  class="self-auto"
+                >
+                  <span class="i-mdi-comment-outline mr-1"></span> Message
+                </BaseButton>
+              </div>
             </div>
 
             <!-- Edit Profile Modal -->
@@ -90,8 +105,11 @@
               <!-- Followers -->
               <div class="text-center">
                 <h1
-                  @click="showFollowerModal = true"
-                  class="leading-6 text-xl font-bold text-gray-500 hover:underline hover:text-blue-600 cursor-pointer"
+                  @click="
+                    foundUser?.followerCount ? openFollowingModal() : null
+                  "
+                  :class="{ 'hover:underline': foundUser?.followerCount }"
+                  class="leading-6 text-xl font-bold text-gray-500 cursor-pointer"
                 >
                   {{ foundUser?.followerCount ?? 0 }}
                 </h1>
@@ -101,7 +119,11 @@
               <!-- Followings -->
               <div class="text-center">
                 <h1
-                  class="leading-6 text-xl font-bold text-gray-500 hover:underline hover:text-blue-600 cursor-pointer"
+                  @click="
+                    foundUser?.followingCount ? openFollowingModal(true) : null
+                  "
+                  :class="{ 'hover:underline': foundUser?.followingCount }"
+                  class="leading-6 text-xl font-bold text-gray-500 cursor-pointer"
                 >
                   {{ foundUser?.followingCount ?? 0 }}
                 </h1>
@@ -119,8 +141,12 @@
           </div>
 
           <!-- follower modal -->
-          <BaseModal v-model="showFollowerModal">
-            <FollowerModal />
+          <BaseModal v-model="showFollowerModal.show">
+            <FollowerModal
+              @close="showFollowerModal.show = false"
+              :is-following-modal="showFollowerModal.isFollowingModal"
+              :user="foundUser"
+            />
           </BaseModal>
         </div>
         <!-- bios -->
@@ -132,7 +158,7 @@
 
     <!-- main -->
     <div class="mt-7 bg-white p-4 rounded-3xl h-screen">
-      <BaseTab :tabs="[`${foundUser?.postCount ?? 0} Posts`, `12 Saved`]">
+      <BaseTab :tabs="tabs">
         <template #tab-1>
           <ProfilePostsTabView :posts="posts" />
         </template>
@@ -151,7 +177,7 @@ import { PostEntity, User } from "types";
 // states
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
-const showFollowerModal = ref(false);
+const showFollowerModal = reactive({ show: false, isFollowingModal: false });
 const showEditProfileModal = ref(false);
 const avatarPreview = ref("");
 const uploading = ref(false);
@@ -163,9 +189,25 @@ const username = ref("");
 const userLoading = ref(true);
 const postLoading = ref(false);
 
+const tabs = computed(() => {
+  let tabs = [`${foundUser.value?.postCount ?? 0} Posts`];
+
+  if (username?.value === user.value?.username) {
+    tabs.push(`${foundUser.value?.savedPostCount ?? 0} Saved Posts`);
+  }
+
+  return tabs;
+});
+
 // composables
+const openFollowingModal = (isFollowing = false) => {
+  showFollowerModal.show = true;
+  showFollowerModal.isFollowingModal = isFollowing;
+};
+
 const { uploadFile } = useFileApi();
 const { uploadUserAvatar, findByUsername } = useUserApi();
+const { followUser, unFollowUser } = useFollowerApi();
 const { fetchPosts } = usePostApi();
 const route = useRoute();
 const router = useRouter();
@@ -188,6 +230,18 @@ const handleFileInput = async (e: Event) => {
   }
 
   uploading.value = false;
+};
+
+const manageFollow = async () => {
+  if (!foundUser.value?.following) {
+    const res = await followUser(foundUser.value?.username!);
+    foundUser.value!.following = true;
+    foundUser.value!.followerCount! += 1;
+  } else {
+    const res = await unFollowUser(foundUser.value?.username!);
+    foundUser.value!.following = false;
+    foundUser.value!.followerCount! -= 1;
+  }
 };
 
 const callPostApi = async () => {

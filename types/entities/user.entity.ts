@@ -1,5 +1,6 @@
 import { BaseEntity } from "./base.entity";
 import { FileEntity as File } from "./file.entity";
+import { FollowerEntity } from "./follower.entity";
 
 export class User extends BaseEntity {
      firstName?: string;
@@ -15,9 +16,13 @@ export class User extends BaseEntity {
      avatar?: File;
      avatarId?: string;
      birthDate?: Date;
+     followers?: FollowerEntity[];
+     followings?: FollowerEntity[];
      postCount?: number
+     savedPostCount?: number
      followerCount?: number
      followingCount?: number
+     following?: boolean
 
      constructor(data?: Partial<User>) {
           super()
