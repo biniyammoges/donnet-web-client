@@ -1,5 +1,7 @@
 <template>
-  <div class="flex items-center justify-start flex-wrap gap-2">
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 items-center justify-start flex-wrap gap-2"
+  >
     <h1 v-if="!posts?.length" class="text-xl text-gray-600">No posts so far</h1>
     <div
       @click="openPreviewPostModal(post)"
@@ -56,7 +58,7 @@ const props = defineProps({
 
 <style scoped>
 .post {
-  @apply relative max-w-[270px] w-full h-[175px] rounded-xl overflow-hidden  cursor-pointer;
+  @apply relative  w-full h-[215px] rounded-xl overflow-hidden  cursor-pointer;
 }
 
 .overlay {

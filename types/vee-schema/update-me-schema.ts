@@ -7,5 +7,5 @@ export const UpdateMeValidationSchema = Yup.object({
      birthDate: Yup.date().optional(),
      username: Yup.string().label("Username").required().min(5).max(35),
      password: Yup.string().label("Confirm password").required().min(8),
-     bio: Yup.string().label("Bio").optional().min(10).max(120)
+     bio: Yup.string().label("Bio").optional().min(10).max(60)
 })

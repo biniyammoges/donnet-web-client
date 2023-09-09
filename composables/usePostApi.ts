@@ -1,4 +1,4 @@
-import { CommentEntity, CreateCommentDto, CreatePostDto, FilterQuery, Paginate, PostEntity, PostLikeEntity } from 'types'
+import { CommentEntity, CreateCommentDto, CreatePostDto, FilterQuery, Paginate, PostEntity, PostLikeEntity, SavedPostEntity } from 'types'
 import useAxios from '~/composables/useAxios'
 
 export default function usePostApi() {
@@ -37,5 +37,15 @@ export default function usePostApi() {
           return resp
      }
 
-     return { createPost, fetchPosts, likePost, createComment, fetchComments, likeComment, fetchReplies }
+     const savePost = async (postId: string, unsave = false) => {
+          const resp = await useAxios<Comment>(`api/post/${postId}/save?${unsave ? 'unsave=true' : ''}`)
+          return resp
+     }
+
+     const fetchSavedPosts = async () => {
+          const resp = await useAxios<SavedPostEntity[]>(`api/post/retrieve/saved`)
+          return resp
+     }
+
+     return { createPost, fetchPosts, likePost, createComment, fetchComments, likeComment, fetchReplies, savePost, fetchSavedPosts }
 };

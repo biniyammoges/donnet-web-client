@@ -26,7 +26,7 @@
               v-else
               class="w-9 h-9 rounded-full border text-gray-500 border-gray-500 flex items-center justify-center"
             >
-              {{ joinFirstCharacters(user?.firstName!, user?.lastName!) }}
+              {{ joinFirstCharacters(user?.firstName, user?.lastName) }}
             </div>
             <span
               class="h-2 w-2 top-1 right-1 absolute rounded-full bg-green-400"

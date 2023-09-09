@@ -101,7 +101,10 @@
           @on-reply.self="(e) => emits('on-reply', e)"
           :reply="reply"
         />
-        <div class="flex items-center gap-x-2" v-if="comment?.replyCount">
+        <div
+          class="flex items-center gap-x-2"
+          v-if="comment?.replyCount && comment.replyCount > 10"
+        >
           <div class="h-[1px] bg-gray-400 w-3"></div>
           <button
             @click="toggleReply"

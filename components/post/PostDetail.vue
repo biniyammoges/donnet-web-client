@@ -73,12 +73,63 @@
             </div>
           </div>
           <div class="flex gap-x-1">
-            <button class="text-gray-400 hover:text-gray-600 px-2 text-3xl">
-              <span class="i-mdi-dots-horizontal"></span>
-            </button>
+            <div class="relative shrink-0" ref="menuEl">
+              <button
+                @click="openMenu"
+                class="text-gray-400 hover:text-gray-600 px-2 text-3xl h-8"
+              >
+                <span class="i-mdi-dots-horizontal"></span>
+              </button>
+
+              <!-- menus -->
+              <div
+                v-if="showMenus"
+                class="absolute w-40 h-auto top-full right-0 bg-green-400 shadow-2xl rounded-lg"
+              >
+                <!-- position indicator -->
+                <div
+                  class="indicator bg-white border h-6 w-6 borders absolute right-2 -top-2 rotate-45"
+                ></div>
+
+                <!-- buttons container -->
+                <div
+                  class="z-30 w-40 overflow-hidden rounded-lg borders border absolute h-auto top-0 right-0"
+                >
+                  <!-- <div
+                    class="absolute w-6 rounded h-[3px] bg-white right-2 -top-[1px]"
+                  ></div> -->
+                  <button
+                    @click="savePost"
+                    class="flex z-0 flex-nowrap items-center gap-x-2 bg-white hover:bg-blue-50 w-full text-gray-600 hover:text-gray-900 py-1 px-3"
+                  >
+                    <span class="i-mdi-bookmark-outline"> </span>
+                    {{ post.saved ? "Unsave" : "Save" }}
+                  </button>
+                  <button
+                    class="flex flex-nowrap items-center gap-x-2 bg-white text-gray-400 py-1 px-3 w-full"
+                  >
+                    <span class="i-mdi-warning-circle-outline"> </span>Report
+                  </button>
+                  <button
+                    v-if="isCreator(post?.creator?.id ?? '')"
+                    class="flex flex-nowrap items-center gap-x-2 bg-white text-gray-400 py-1 px-3 w-full"
+                  >
+                    <span class="i-mdi-edit-box-outline"> </span>Edit
+                  </button>
+                  <button
+                    v-if="isCreator(post?.creator?.id ?? '')"
+                    class="flex flex-nowrap items-center gap-x-2 bg-white w-full text-red-300 py-1 px-3"
+                  >
+                    <span class="i-mdi-trash-can-outline"> </span>Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <button
               @click="postModal.closePreviewPostModal"
-              class="fixed top-2 right-2 md:static text-gray-400 hover:text-gray-600 px-2 text-3xl"
+              :class="{ 'bg-gray-50 bg-opacity-20 ': post.medias?.length }"
+              class="fixed flex items-center justify-center top-2 right-2 md:static h-9 w-9 lg:w-auto lg:px-2 rounded-full text-gray-400 hover:text-gray-600 text-3xl"
             >
               <span class="i-mdi-close"></span>
             </button>
@@ -179,11 +230,17 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { CommentReplyEventDto, CreateCommentDto } from "types";
-import { useModalStore, usePostStore } from "~/store";
+import { useModalStore, usePostStore, useAuthStore } from "~/store";
 
+const authStore = useAuthStore();
 const postModal = useModalStore();
 const { likePost, updateCommentCount, setComments } = usePostStore();
-const { likePost: callLikeApi, createComment, fetchComments } = usePostApi();
+const {
+  likePost: callLikeApi,
+  createComment,
+  fetchComments,
+  savePost: savePostApi,
+} = usePostApi();
 
 // states
 const { showPreviewPostModal, selectedPost: post } = storeToRefs(postModal);
@@ -192,9 +249,14 @@ const commentDto = reactive<CreateCommentDto>({
   parentCommentId: "",
   postId: "",
 });
+const { user } = storeToRefs(authStore);
 const textAreaRef = ref<HTMLTextAreaElement | null>(null);
 const hasPostManyImages = computed(() => post.value?.medias?.length! > 1);
 const commentLoading = ref(false);
+const showMenus = ref(false);
+const menuEl = ref<HTMLDivElement | null>(null);
+
+const isCreator = (creatorId: string) => user.value?.id === creatorId;
 
 // Handles textarea height as user enter the text
 const handleTextAreaHeight = (e: Event) => {
@@ -264,6 +326,23 @@ const comment = async () => {
   }
 };
 
+const openMenu = () => {
+  showMenus.value = true;
+};
+
+const closeMenu = (e: any) => {
+  e.stopPropagation();
+
+  if (menuEl.value && !menuEl.value.contains(e.target)) {
+    showMenus.value = false;
+  }
+};
+
+const savePost = async () => {
+  await savePostApi(post.value?.id!, post.value!.saved);
+  post.value!.saved = !post.value!.saved;
+};
+
 watchEffect(async () => {
   if (showPreviewPostModal.value && post.value?.id) {
     commentLoading.value = true;
@@ -286,6 +365,18 @@ const onReply = async (e: CommentReplyEventDto) => {
   words.splice(0, hasAtChar ? 1 : 0, `@${e.username}`);
   commentDto.text = words.join(" ");
 };
+
+onMounted(() => {
+  if (process.client) {
+    window.addEventListener("click", closeMenu);
+  }
+});
+
+onUnmounted(() => {
+  if (process.client) {
+    window.addEventListener("click", closeMenu);
+  }
+});
 </script>
 
 <style scoped>

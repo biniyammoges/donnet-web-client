@@ -11,8 +11,23 @@
         <span class="i-mdi-close"></span>
       </button>
     </div>
-    <div v-if="updateError" class="py-2 px-5 bg-red-50 text-red-900">
+    <div
+      v-if="updateError"
+      class="py-2 px-5 bg-red-50 text-red-900 flex items-center justify-between"
+    >
       {{ updateError }}
+      <button @click="updateError = ''" class="flex items-center">
+        <span class="i-mdi-close"></span>
+      </button>
+    </div>
+    <div
+      class="py-2 px-5 bg-yellow-50 text-yellow-900 flex items-centers gap-x-3"
+    >
+      <span class="i-mdi-warning-circle-outline text-3xl"></span>
+      <p>
+        Attention! If you modify your email address, username, or both, you will
+        be automatically logged out.
+      </p>
     </div>
     <form
       @submit.prevent="submitUpdate"
@@ -26,7 +41,6 @@
             name="firstName"
             v-model="userDto.firstName"
             id="firstName"
-            size="full"
             placeholder="First name"
             requried
           />
@@ -42,7 +56,6 @@
             name="lastName"
             v-model="userDto.lastName"
             id="lastName"
-            size="full"
             placeholder="Last name"
           />
         </div>
@@ -58,7 +71,6 @@
             v-model="userDto.email"
             type="email"
             id="email"
-            size="full"
             placeholder="example@email.com"
           />
         </div>
@@ -69,14 +81,17 @@
         <label class="text-gray-500" for="bio">Bio</label>
         <div class="xs:max-w-[350px] w-full">
           <textarea
+            maxlength="60"
             v-model="userDto.bio"
             placeholder="Write something about yourself"
             id="bio"
             cols="30"
             rows="2"
-            class="border text-base w-full rounded-xl outline-none resize-none px-3 py-2 focus:border-blue-50 text-gray-600"
+            class="border text-base w-full rounded-xl outline-none resize-none px-3 py-2 focus:border-blue-500 text-gray-600"
           ></textarea>
-          <p class="text-end text-sm text-gray-500">0/60</p>
+          <p class="text-end text-sm text-gray-500">
+            {{ userDto.bio?.length }}/60
+          </p>
         </div>
       </div>
 
@@ -89,7 +104,6 @@
             name="birthDate"
             type="date"
             id="dob"
-            size="full"
             placeholder="Date of birth"
           />
         </div>
@@ -104,7 +118,6 @@
             name="username"
             v-model="userDto.username"
             id="username"
-            size="full"
             placeholder="@iambini"
           />
         </div>
@@ -119,7 +132,6 @@
             requried
             type="password"
             id="username"
-            size="full"
             name="password"
             placeholder="Confirm password"
           />
@@ -138,7 +150,8 @@ import { storeToRefs } from "pinia";
 import { UpdateMeDto, UpdateMeValidationSchema } from "~/types";
 
 const { updateMe } = useAuthApi();
-const { user } = storeToRefs(useAuthStore());
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 
 const $emit = defineEmits(["close"]);
 
@@ -171,7 +184,14 @@ const submitUpdate = handleSubmit(async () => {
           : error?.value.message;
     }
   }
+
   if (data.value) {
+    authStore.setUser({
+      ...user.value,
+      firstName: userDto.firstName,
+      lastName: userDto.lastName,
+      bio: userDto.bio,
+    });
     $emit("close");
   }
 });

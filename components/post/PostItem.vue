@@ -42,9 +42,58 @@
           </p>
         </div>
       </div>
-      <button class="text-gray-400 hover:text-gray-600 px-2 text-3xl">
-        <span class="i-mdi-dots-horizontal"></span>
-      </button>
+      <div class="relative shrink-0" ref="menuEl">
+        <button
+          @click="openMenu"
+          class="text-gray-400 hover:text-gray-600 px-2 text-3xl"
+        >
+          <span class="i-mdi-dots-horizontal"></span>
+        </button>
+
+        <!-- menus -->
+        <div
+          v-if="showMenus"
+          class="absolute w-40 h-auto top-full right-0 bg-green-400 shadow-2xl rounded-lg"
+        >
+          <!-- position indicator -->
+          <div
+            class="indicator bg-white border h-6 w-6 borders absolute right-2 -top-2 rotate-45"
+          ></div>
+
+          <!-- buttons container -->
+          <div
+            class="z-30 w-40 overflow-hidden rounded-lg borders border absolute h-auto top-0 right-0"
+          >
+            <!-- <div
+              class="absolute w-6 rounded h-[3px] bg-white right-2 -top-[1px]"
+            ></div> -->
+            <button
+              @click="savePost"
+              class="flex z-0 flex-nowrap items-center gap-x-2 bg-white hover:bg-blue-50 w-full text-gray-600 hover:text-gray-900 py-1 px-3"
+            >
+              <span class="i-mdi-bookmark-outline"> </span>
+              {{ post.saved ? "Unsave" : "Save" }}
+            </button>
+            <button
+              class="flex flex-nowrap items-center gap-x-2 bg-white text-gray-400 py-1 px-3 w-full"
+            >
+              <span class="i-mdi-warning-circle-outline"> </span>Report
+            </button>
+            <button
+              v-if="isCreator(post?.creator?.id ?? '')"
+              class="flex flex-nowrap items-center gap-x-2 bg-white text-gray-400 py-1 px-3 w-full"
+            >
+              <span class="i-mdi-edit-box-outline"> </span>Edit
+            </button>
+            <button
+              v-if="isCreator(post?.creator?.id ?? '')"
+              class="flex flex-nowrap items-center gap-x-2 bg-white w-full text-red-300 py-1 px-3"
+            >
+              <span class="i-mdi-trash-can-outline"> </span>Delete
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Image -->
@@ -135,12 +184,33 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import { PostEntity } from "types";
 import { PropType } from "vue";
 
 const { likePost } = usePostStore();
-const { likePost: callLikeApi } = usePostApi();
+const authStore = useAuthStore();
+
+const { likePost: callLikeApi, savePost: savePostApi } = usePostApi();
 const { openPreviewPostModal } = useModalStore();
+const { user } = storeToRefs(authStore);
+
+const showMenus = ref(false);
+const menuEl = ref<HTMLDivElement | null>(null);
+
+const isCreator = (creatorId: string) => user.value?.id === creatorId;
+
+const openMenu = () => {
+  showMenus.value = true;
+};
+
+const closeMenu = (e: any) => {
+  e.stopPropagation();
+
+  if (menuEl.value && !menuEl.value.contains(e.target)) {
+    showMenus.value = false;
+  }
+};
 
 const props = defineProps({
   post: {
@@ -155,6 +225,23 @@ const like = async () => {
   // update liked post from store
   likePost(props.post.id!, props.post.liked);
 };
+
+const savePost = async () => {
+  await savePostApi(props.post?.id!, props.post.saved);
+  props.post.saved = !props.post.saved;
+};
+
+onMounted(() => {
+  if (process.client) {
+    window.addEventListener("click", closeMenu);
+  }
+});
+
+onUnmounted(() => {
+  if (process.client) {
+    window.addEventListener("click", closeMenu);
+  }
+});
 </script>
 
 <style scoped>

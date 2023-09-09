@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full p-5">
+  <div class="w-full pt-5 px-5 pb-16">
     <!-- user detail -->
     <ProfileUserSkeleton v-if="userLoading" />
     <div v-else class="flex gap-x-7">
@@ -55,11 +55,11 @@
         <div>
           <div class="flex items-center gap-x-6">
             <div>
-              <h1 class="text-xl text-gray-700">
+              <h1 class="text-2xl text-gray-700">
                 {{ foundUser?.firstName + " " + foundUser?.lastName }}
               </h1>
-              <h3 class="text-gray-600 text-lg">{{ foundUser?.email }}</h3>
-              <h4 class="text-base text-gray-500">
+              <h3 class="text-gray-700 text-xl mt-1">{{ foundUser?.email }}</h3>
+              <h4 class="text-lg text-gray-700 mt-1">
                 @{{ foundUser?.username }}
               </h4>
             </div>
@@ -102,7 +102,7 @@
           </div>
 
           <div class="mt-3">
-            <div class="flex gap-x-8">
+            <div class="flex gap-x-5">
               <!-- Followers -->
               <div class="text-center flex">
                 <h1
@@ -168,13 +168,13 @@
     <post-detail"/>
 
     <!-- main -->
-    <div class="mt-5 bg-white p-4 rounded-3xl h-screen">
+    <div class="mt-5 bg-white p-4 rounded-3xl max-w-6xl">
       <BaseTab :tabs="tabs">
         <template #tab-1>
           <ProfilePostsTabView :posts="posts" />
         </template>
         <template v-if="user?.username === username" #tab-2>
-          <h1>Saved</h1>
+          <ProfilePostsTabView :posts="savedPosts" />
         </template>
       </BaseTab>
     </div>
@@ -197,6 +197,7 @@ const uploading = ref(false);
 
 const foundUser = ref<User>();
 const posts = ref<PostEntity[]>([]);
+const savedPosts = ref<PostEntity[]>([]);
 const username = ref("");
 
 const userLoading = ref(true);
@@ -221,7 +222,7 @@ const openFollowingModal = (isFollowing = false) => {
 const { uploadFile } = useFileApi();
 const { uploadUserAvatar, findByUsername } = useUserApi();
 const { followUser, unFollowUser } = useFollowerApi();
-const { fetchPosts } = usePostApi();
+const { fetchPosts, fetchSavedPosts } = usePostApi();
 const route = useRoute();
 const router = useRouter();
 
@@ -267,6 +268,13 @@ const callPostApi = async () => {
   }
 };
 
+const callSavedPostApi = async () => {
+  const { data } = await fetchSavedPosts();
+  if (data.value) {
+    savedPosts.value = data.value.map((sp) => sp.post!) ?? [];
+  }
+};
+
 const callUserApi = async () => {
   userLoading.value = true;
   const { data, error } = await findByUsername(username.value);
@@ -284,11 +292,20 @@ const callUserApi = async () => {
   }
 };
 
+watch(user, () => {
+  //  updates foundUser data when user date from store is changed
+  if (username.value === user.value?.username) {
+    foundUser.value!.firstName = user?.value.firstName;
+    foundUser.value!.lastName = user?.value.lastName;
+    foundUser.value!.bio = user?.value.bio;
+  }
+});
+
 onMounted(async () => {
   closePreviewPostModal();
   username.value = (route.params?.username as string) ?? "";
 
   await nextTick();
-  await Promise.all([callPostApi(), callUserApi()]);
+  await Promise.all([callPostApi(), callUserApi(), callSavedPostApi()]);
 });
 </script>

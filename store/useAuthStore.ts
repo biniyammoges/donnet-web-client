@@ -3,7 +3,7 @@ import { AuthResponse } from "types";
 import { User } from "types";
 import { FileEntity } from "types/entities/file.entity";
 
-export const useAuthStore = defineStore('d', () => {
+export const useAuthStore = defineStore('auth-store', () => {
      // retrieve tokens from cookie when pages refreshs
      const tokensFromCookie = useCookie<AuthResponse | null>('auth-tokens')
 
