@@ -4,7 +4,7 @@
       <!-- Creator -->
       <div class="creator">
         <nuxt-link
-          to="/"
+          :to="`/u/${post?.creator?.username}`"
           class="avatar mr-3 block relative h-8 w-8 rounded-full"
         >
           <img
@@ -31,7 +31,7 @@
         </nuxt-link>
         <div class="flex flex-col justify-center">
           <nuxt-link
-            to="/profile"
+            :to="`/u/${post?.creator?.username}`"
             class="text-gray-900 leading-5 hover:underline"
             >{{
               post.creator?.firstName + " " + post.creator?.lastName

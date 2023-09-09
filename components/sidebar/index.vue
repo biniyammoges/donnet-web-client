@@ -79,7 +79,10 @@
                     alt="image"
                     class="h-8 w-8 rounded-full object-cover"
                   />
-                  <div v-else class="text-base">
+                  <div
+                    v-else
+                    class="text-base border border-yellow-800 text-yellow-800 rounded-full w-8 h-8 flex items-center justify-center"
+                  >
                     {{ joinFirstCharacters(user?.firstName, user?.lastName) }}
                   </div>
                 </div>

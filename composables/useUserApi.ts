@@ -20,5 +20,10 @@ export default function useUserApi() {
           return resp
      }
 
-     return { validateUsername, uploadUserAvatar, findByUsername }
+     const searchUser = async (keyword: string) => {
+          const resp = await useAxios<User[]>(`/api/user/search/?keyword=${keyword}`);
+          return resp
+     }
+
+     return { validateUsername, uploadUserAvatar, findByUsername, searchUser }
 };

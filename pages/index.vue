@@ -54,6 +54,7 @@ import { storeToRefs } from "pinia";
 const { fetchPosts } = usePostApi();
 const { setPosts } = usePostStore();
 const { user } = useAuthStore();
+const { closePreviewPostModal } = useModalStore();
 
 // state
 const { posts } = storeToRefs(usePostStore());
@@ -72,6 +73,7 @@ const fetchOnScroll = async () => {
 };
 
 onMounted(async () => {
+  closePreviewPostModal();
   await execute();
 });
 

@@ -34,7 +34,7 @@
           <!-- Creator -->
           <div class="creator">
             <nuxt-link
-              to="/"
+              :to="`/u/${post?.creator?.username}`"
               class="avatar mr-3 block relative h-8 w-8 rounded-full"
             >
               <img
@@ -55,12 +55,13 @@
                 }}
               </div>
               <span
+                v-if="post?.creator?.isOnline"
                 class="h-2 w-2 top-1 -right-1 absolute rounded-full bg-green-500"
               ></span>
             </nuxt-link>
             <div class="flex flex-col justify-center">
               <nuxt-link
-                to="/profile"
+                :to="`/u/${post?.creator?.username}`"
                 class="text-gray-500 leading-4 hover:underline"
                 >{{
                   post.creator?.firstName + " " + post.creator?.lastName
@@ -86,12 +87,12 @@
 
         <div class="relative md:overflow-y-auto h-full">
           <!-- Captions -->
-          <p v-if="post?.caption" class="text-gray-500">
+          <p v-if="post?.caption" class="text-gray-600 mt-2 pr-6">
             {{ post.caption }}
           </p>
 
           <!-- Actions -->
-          <div class="flex items-center mt-1 gap-x-3">
+          <div class="flex items-center mt-2 gap-x-3">
             <button
               @click="like"
               class="flex items-center text-sm py-[7px] gap-x-[5px]"
@@ -132,17 +133,15 @@
             />
             <div
               v-if="!commentLoading && !post?.comments?.length"
-              class="flex flex-col items-center justify-center"
+              class="flex flex-col items-center justify-center h-full"
             >
-              <h1 class="text-gray-500 text-lg flex items-center gap-x-1">
-                <span class="i-mdi-smiley-cry-outline text-xl"></span> No
-                comments so far!
-              </h1>
-              <p class="text-sm text-gray-400">be the first one to comment!</p>
-              <base-button variant="primaryRevert">
-                <span class="i-mdi-reload mr-1"></span>
-                Reload</base-button
+              <p class="text-4xl">🤷‍♂️</p>
+              <h1
+                class="text-gray-500 font-bold text-2xl flex items-center gap-x-1"
               >
+                No comments so far!
+              </h1>
+              <p class="text-gray-600">be the first one to comment!</p>
             </div>
             <div class="h-28"></div>
           </div>

@@ -31,3 +31,13 @@ export interface RegisterDto {
      dateOfBirth: Date;
      bio?: string;
 }
+
+export interface UpdateMeDto {
+     firstName: string;
+     lastName: string;
+     username: string;
+     email: string;
+     password: string;
+     birthDate?: String;
+     bio?: string
+}

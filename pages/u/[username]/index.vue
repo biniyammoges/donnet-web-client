@@ -93,27 +93,31 @@
 
             <!-- Edit Profile Modal -->
             <BaseModal
+              persistant
               v-if="user?.username === username"
               v-model="showEditProfileModal"
             >
-              <ProfileEditForm />
+              <ProfileEditForm @close="showEditProfileModal = false" />
             </BaseModal>
           </div>
 
-          <div class="mt-5">
+          <div class="mt-3">
             <div class="flex gap-x-8">
               <!-- Followers -->
-              <div class="text-center">
+              <div class="text-center flex">
                 <h1
                   @click="
                     foundUser?.followerCount ? openFollowingModal() : null
                   "
                   :class="{ 'hover:underline': foundUser?.followerCount }"
-                  class="leading-6 text-xl font-bold text-gray-500 cursor-pointer"
+                  class="text-sm text-gray-500 cursor-pointer"
                 >
-                  {{ foundUser?.followerCount ?? 0 }}
+                  <span class="font-bold text-2xl">{{
+                    foundUser?.followerCount ?? 0
+                  }}</span>
+                  Followers
                 </h1>
-                <p class="text-sm text-gray-600">Followers</p>
+                <!-- <p class="text-sm text-gray-700">Followers</p> -->
               </div>
 
               <!-- Followings -->
@@ -123,19 +127,23 @@
                     foundUser?.followingCount ? openFollowingModal(true) : null
                   "
                   :class="{ 'hover:underline': foundUser?.followingCount }"
-                  class="leading-6 text-xl font-bold text-gray-500 cursor-pointer"
+                  class="text-sm text-gray-500 cursor-pointer"
                 >
-                  {{ foundUser?.followingCount ?? 0 }}
+                  <span class="font-bold text-2xl">{{
+                    foundUser?.followingCount ?? 0
+                  }}</span>
+                  Followings
                 </h1>
-                <p class="text-sm text-gray-600">Followings</p>
               </div>
 
               <!-- Posts -->
               <div class="text-center">
-                <h1 class="leading-6 text-xl font-bold text-gray-500">
-                  {{ foundUser?.postCount ?? 0 }}
+                <h1 class="text-sm text-gray-500">
+                  <span class="font-bold text-2xl">{{
+                    foundUser?.postCount ?? 0
+                  }}</span>
+                  Posts
                 </h1>
-                <p class="text-sm text-gray-600">Posts</p>
               </div>
             </div>
           </div>
@@ -160,7 +168,7 @@
     <post-detail"/>
 
     <!-- main -->
-    <div class="mt-7 bg-white p-4 rounded-3xl h-screen">
+    <div class="mt-5 bg-white p-4 rounded-3xl h-screen">
       <BaseTab :tabs="tabs">
         <template #tab-1>
           <ProfilePostsTabView :posts="posts" />
@@ -178,8 +186,10 @@ import { storeToRefs } from "pinia";
 import { PostEntity, User } from "types";
 
 // states
+const { closePreviewPostModal } = useModalStore();
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
+
 const showFollowerModal = reactive({ show: false, isFollowingModal: false });
 const showEditProfileModal = ref(false);
 const avatarPreview = ref("");
@@ -275,6 +285,7 @@ const callUserApi = async () => {
 };
 
 onMounted(async () => {
+  closePreviewPostModal();
   username.value = (route.params?.username as string) ?? "";
 
   await nextTick();

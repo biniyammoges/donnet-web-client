@@ -3,7 +3,7 @@
     <!-- Commentor Profile Detail -->
     <div class="flex items-center">
       <nuxt-link
-        to="/"
+        :to="`/u/${reply?.commentor?.username}`"
         class="avatar shrink-0 mr-1 block relative h-8 w-8 rounded-full"
       >
         <img
@@ -33,7 +33,7 @@
       <!-- Commentor name and date the comment created -->
       <div class="flex items-center gap-x-2">
         <nuxt-link
-          to="/profile"
+          :to="`/u/${comment?.commentor?.username}`"
           class="text-gray-600 hover:underline text-base"
           >{{
             reply?.commentor?.firstName + " " + reply?.commentor?.lastName

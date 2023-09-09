@@ -1,5 +1,5 @@
 import useAxios from '~/composables/useAxios'
-import { AuthResponse, ErrorResponse, LoginDto, RegisterDto } from "types/"
+import { AuthResponse, ErrorResponse, LoginDto, RegisterDto, UpdateMeDto } from "types/"
 
 export default function useAuthApi() {
      const login = async (body: LoginDto) => {
@@ -28,5 +28,10 @@ export default function useAuthApi() {
           return resp
      }
 
-     return { login, register, getMe, logout, refreshAccessToken }
+     const updateMe = async (body: UpdateMeDto) => {
+          const resp = await useAxios('api/auth/me/update', { method: 'put', body })
+          return resp
+     }
+
+     return { login, register, getMe, logout, refreshAccessToken, updateMe }
 };

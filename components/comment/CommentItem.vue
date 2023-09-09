@@ -2,7 +2,7 @@
   <div class="flex py-2">
     <!-- Commentor Profile Detail -->
     <nuxt-link
-      to="/"
+      :to="`/u/${comment?.commentor?.username}`"
       class="avatar mr-1 block relative h-8 w-8 rounded-full shrink-0"
     >
       <img
@@ -31,9 +31,13 @@
     <div>
       <!-- Commentor name and date the comment created -->
       <div class="flex items-center gap-x-2">
-        <nuxt-link to="/profile" class="text-gray-600 hover:underline">{{
-          comment?.commentor?.firstName + " " + comment?.commentor?.lastName
-        }}</nuxt-link>
+        <nuxt-link
+          :to="`/u/${comment?.commentor?.username}`"
+          class="text-gray-600 hover:underline"
+          >{{
+            comment?.commentor?.firstName + " " + comment?.commentor?.lastName
+          }}</nuxt-link
+        >
         <span class="text-xs text-gray-400">{{
           dateToTimeAgo(new Date(comment?.createdAt!))
         }}</span>
