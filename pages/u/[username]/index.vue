@@ -156,6 +156,9 @@
       </div>
     </div>
 
+    <!-- post detail modal -->
+    <post-detail"/>
+
     <!-- main -->
     <div class="mt-7 bg-white p-4 rounded-3xl h-screen">
       <BaseTab :tabs="tabs">

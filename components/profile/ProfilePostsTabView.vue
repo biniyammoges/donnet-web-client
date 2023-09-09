@@ -1,7 +1,12 @@
 <template>
   <div class="flex items-center justify-start flex-wrap gap-2">
     <h1 v-if="!posts?.length" class="text-xl text-gray-600">No posts so far</h1>
-    <div class="post" v-for="post of posts" :key="post?.id">
+    <div
+      @click="openPreviewPostModal(post)"
+      class="post"
+      v-for="post of posts"
+      :key="post?.id"
+    >
       <div
         class="flex justify-center items-center bg-blue-100 h-full p-5 text-center"
         v-if="!post.medias?.length"
@@ -42,6 +47,7 @@
 <script lang="ts" setup>
 import { PostEntity } from "types";
 import { PropType } from "vue";
+const { openPreviewPostModal } = useModalStore();
 
 const props = defineProps({
   posts: Array as PropType<PostEntity[]>,
