@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white rounded-r-3xl px-3 md:px-3 py-2 fixed left-0 top-0 bottom-0 flex z-50 shadow-md"
+    class="bg-white rounded-r-3xl px-3 md:px-3 py-2 fixed left-0 top-0 bottom-0 flex z-50"
   >
     <div
       class="h-full flex flex-col items-center"
@@ -114,6 +114,7 @@ import { useModalStore } from "~/store/useModalStore";
 import { useAuthStore } from "~/store/useAuthStore";
 import { useSidebarStore } from "~/store/useSidebarStore";
 import { storeToRefs } from "pinia";
+const route = useRoute();
 
 // stores
 const { user, destroyAuthData } = useAuthStore();
@@ -135,7 +136,10 @@ const closeSearchBar = () => {
 };
 
 watch(showSearchBox, (val) => {
-  sidebarStore.setCollapsed(val);
+  // exclude expanding sidebar for message page
+  if (!route.path.startsWith("/message")) {
+    sidebarStore.setCollapsed(val);
+  }
 });
 
 const getFirstAndLastName = computed(

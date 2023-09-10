@@ -8,7 +8,8 @@
 
   <div
     :class="{
-      'sm:ml-[80px] lg:ml-[244px]': tokens?.accessToken,
+      'sm:ml-[80px]': tokens?.accessToken,
+      'lg:ml-[244px]': tokens?.accessToken && !isOnMessagePage,
     }"
     class="flex-1"
   >
@@ -20,7 +21,10 @@
 </template>
 
 <script setup lang="ts">
+const route = useRoute();
 import { useAuthStore } from "~/store/useAuthStore";
+
+const isOnMessagePage = computed(() => route.path.startsWith("/message"));
 
 const { tokens } = useAuthStore();
 </script>

@@ -29,6 +29,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { PropType } from "vue";
+const route = useRoute();
 const sidebarStore = useSidebarStore();
 const { collapsed } = storeToRefs(sidebarStore);
 
@@ -59,7 +60,8 @@ const updateScreenWidth = () => {
 };
 
 watch(screenWidth, () => {
-  if (screenWidth.value >= 1024) {
+  // excude expanding sidebar for message page
+  if (!route.path.startsWith("/message") && screenWidth.value >= 1024) {
     sidebarStore.setCollapsed(false);
   } else {
     sidebarStore.setCollapsed(true);

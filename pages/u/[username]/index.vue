@@ -82,6 +82,7 @@
                   {{ foundUser?.following ? "Unfollow" : "Follow" }}
                 </BaseButton>
                 <BaseButton
+                  @click="$router.push(`/message?uid=${foundUser?.id}`)"
                   variant="warningRevert"
                   size="small"
                   class="self-auto"
