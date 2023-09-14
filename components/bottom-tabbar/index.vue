@@ -13,7 +13,7 @@
       </div>
 
       <div class="">
-        <bottom-tabbar-button to="/search" title="Search">
+        <bottom-tabbar-button title="Search">
           <template #icon><span class="i-mdi-search"></span> </template>
         </bottom-tabbar-button>
       </div>
@@ -56,6 +56,6 @@ import { useAuthStore } from "~/store/useAuthStore";
 const { user } = storeToRefs(useAuthStore());
 
 const getFirstAndLastName = computed(
-  () => `${user.firstName} ${user.lastName}`
+  () => `${user?.firstName} ${user?.lastName}`
 );
 </script>

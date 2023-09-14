@@ -347,7 +347,7 @@ var chats = [
   },
   {
     id: 19,
-    text: "Thank you for your help! I'll wait for your recommendations.",
+    text: "Thank you for your help! I'll wait for your recommendations. I apologize for the inconvenience. Please provide me with your order details, and I'll look into it right away.",
     side: 1,
   },
 ];

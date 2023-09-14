@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@vee-validate/nuxt', '@pinia/nuxt',],
   runtimeConfig: {
     public: {
-      apiBaseUrl: 'http://localhost:3001'
+      apiBaseUrl: process.env.NUXT_API_URL
     }
   },
   app: {
