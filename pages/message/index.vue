@@ -2,8 +2,8 @@
   <div class="flex gap-x-5">
     <!-- chatrooms -->
     <div
-      :class="{ 'hidden 2md:block': activeIdx }"
-      class="relative w-full 2md:w-[350px] lg:w-[400px] max-h-screen overflow-y-auto bg-white shrink-0"
+      :class="{ 'hidden 2md:block': selectedRoom }"
+      class="relative w-full 2md:w-[350px] lg:w-[400px] h-screen overflow-y-auto bg-white shrink-0"
     >
       <div class="sticky top-0 z-40 bg-white w-full py-6">
         <h1 class="text-2xl px-5 font-bold mb-3 text-gray-600">Messages</h1>
@@ -28,71 +28,24 @@
       </div>
 
       <!-- rooms -->
-      <div>
+      <div class="h-full">
         <div class="px-2">
-          <button
-            :class="{ selected: idx === activeIdx }"
-            @click="
-              () => {
-                activeIdx = idx;
-                router.push(`/message?cid=${idx + 1}`);
-              }
-            "
-            class="room"
-            v-for="(d, idx) of Array(15).fill({
-              id: 1,
-              user: {
-                firstName: 'Biniyam',
-                lastName: 'Moges',
-                username: 'biniyammoges',
-              },
-            })"
-            :key="d?.id"
-          >
-            <div class="profile flex">
-              <div class="avatar">
-                <img
-                  v-if="d?.user?.avatar"
-                  :src="d?.user.avatar.url"
-                  alt="image"
-                  class="h-full w-full rounded-full object-cover"
-                />
-                <div
-                  v-else
-                  class="w-10 h-10 rounded-full border text-gray-500 border-gray-500 flex items-center justify-center"
-                >
-                  {{
-                    joinFirstCharacters(d?.user?.firstName, d?.user?.lastName)
-                  }}
-                </div>
-              </div>
-
-              <div class="flex-1 w-full 2md:max-w-[200px] lg:max-w-[260px]">
-                <p class="name">
-                  {{ d?.user?.firstName + " " + d?.user?.lastName }}
-                </p>
-                <p class="message text-start">
-                  <span>you:</span> Hi biniyam, hope this message finds you well
-                </p>
-              </div>
-              <div
-                class="shrink-0 flex flex-col justify-between items-center ml-auto"
-              >
-                <p class="time">2 hrs ago</p>
-                <p class="badge">3</p>
-              </div>
-            </div>
-          </button>
+          <ChatRoom
+            v-for="room of rooms"
+            :room="room"
+            :selected="selectedRoom?.id === room?.id"
+            :key="room?.id"
+          />
         </div>
       </div>
     </div>
 
     <!-- chats -->
     <div
-      :class="{ 'hidden 2md:block': !activeIdx }"
+      :class="{ 'hidden 2md:block': !selectedRoom }"
       class="relative bg-white w-full max-h-screen overflow-y-auto"
     >
-      <div v-if="!activeIdx" class="flex items-center justify-center h-full">
+      <div v-if="!selectedRoom" class="flex items-center justify-center h-full">
         <div class="text-center">
           <h1 class="text-6xl text-gray-700">
             <span class="i-mdi-comment-outline"></span>
@@ -108,100 +61,32 @@
       </div>
       <div v-else class="h-full relative overflow-y-auto">
         <!-- header -->
-        <div
-          class="sticky z-10 top-0 bg-white flex items-center py-2 px-5 border-b border-b-gray-200"
-        >
-          <button
-            @click="activeIdx = null"
-            class="2md:hidden text-3xl h-8 mr-2 text-gray-500 hover:text-gray-800"
-          >
-            <span class="i-mdi-arrow-left"></span>
-          </button>
-          <div class="flex items-center cursor-pointer">
-            <div class="w-10 h-10 mr-3">
-              <img
-                v-if="user?.avatar"
-                :src="user.avatar.url"
-                alt="image"
-                class="h-full w-full rounded-full object-cover border border-yellow-400"
-              />
-              <div
-                v-else
-                class="w-10 h-10 rounded-full border text-gray-500 border-gray-500 flex items-center justify-center"
-              >
-                {{ joinFirstCharacters(user?.firstName, user?.lastName) }}
-              </div>
-            </div>
-
-            <div class="">
-              <p class="text-lg leading-5">
-                {{ user?.firstName + " " + user?.lastName }}
-              </p>
-              <p class="text-gray-500">Active now</p>
-            </div>
-          </div>
-        </div>
+        <ChatHeader
+          :recipient="
+            selectedRoom?.chatUsers?.length
+              ? selectedRoom?.chatUsers[0].user
+              : null
+          "
+        />
 
         <!-- conversations -->
         <div class="p-7 h-full flex flex-col items-start">
-          <div
-            v-for="chat in chats"
+          <ChatItem
+            v-for="chat of selectedRoom?.chats"
+            :chat="chat"
             :key="chat.id"
-            :class="[chat.side ? '' : 'self-end flex-row-reverse']"
-            class="chat flex w-auto"
-          >
-            <div
-              :class="[chat.side ? 'mr-2 ' : 'bg-blue-600 text-white ml-2 ']"
-              class="bg-blue-100 relative py-2 rounded-lg px-3 w-auto mb-2 max-w-[500px]"
-            >
-              <div
-                :class="[chat.side ? '-left-1' : '-right-1 bg-blue-600']"
-                class="absolute w-4 h-4 bg-blue-100 rotate-45 top-[6px]"
-              ></div>
-
-              <!-- reply -->
-              <div
-                v-if="chat.reply"
-                :class="[
-                  chat.side
-                    ? 'text-gray-900 border-l-gray-700 '
-                    : 'text-blue-100 ',
-                ]"
-                class="border-l-[2px] py-1 my-1 cursor-pointer"
-              >
-                <p class="ml-2 line-clamp-2">
-                  {{ chat.reply.text }}
-                </p>
-              </div>
-
-              <p>{{ chat.text }}</p>
-            </div>
-
-            <!-- reply button -->
-            <button class="reply-button">
-              <span class="i-mdi-keyboard-return"></span>
-            </button>
-          </div>
+          />
         </div>
       </div>
 
       <!-- Write Message -->
       <div
-        v-if="activeIdx"
+        v-if="selectedRoom"
         class="absolute bottom-0 overflow-hidden min-h-[55px] max-h-[120px] bg-[#F0F2F5] flex items-center w-full z-50 px-4"
       >
         <button class="text-2xl h-6 text-gray-500 hover:text-gray-600 px-2">
           <span class="i-mdi-emoji-outline"></span>
         </button>
-
-        <!-- <textarea
-          data-autoresize
-          ref="textAreaRef"
-          rows="1"
-          class="text-sm resize-none w-full bg-transparent py-3 text-gray-600 outline-none pr-2 placeholder:text-gray-500"
-          :placeholder="`Write message here...`"
-          v-model="message"
-        ></textarea> -->
 
         <input
           type="text"
@@ -222,6 +107,7 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import { ChatRoomEntity } from "types";
 
 const { setCollapsed } = useSidebarStore();
 const authStore = useAuthStore();
@@ -229,8 +115,11 @@ const { user } = storeToRefs(authStore);
 const router = useRouter();
 
 const keyword = ref("");
-const activeIdx = ref<number | null>(null);
 const message = ref("");
+
+const rooms = ref<ChatRoomEntity[]>([]);
+const selectedRoom = ref<ChatRoomEntity | null>(null);
+const roomLoading = ref(true);
 
 const textAreaRef = ref<HTMLTextAreaElement | null>(null);
 
@@ -371,54 +260,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.room {
-  @apply bg-white mb-1 block w-full hover:bg-blue-100 py-2 px-3 rounded-lg;
-}
-
-.room.selected {
-  @apply bg-blue-600;
-}
-
-.room .avatar {
-  @apply mr-2 block relative h-10 w-10 rounded-full;
-}
-
-.room.selected .avatar > div {
-  @apply border-blue-50 bg-blue-100 text-blue-900;
-}
-
-.room .name {
-  @apply text-gray-800 text-start truncate;
-}
-
-.room.selected .name {
-  @apply text-white;
-}
-
-.room .message {
-  @apply text-gray-500 text-sm truncate;
-}
-
-.room.selected .message {
-  @apply text-blue-100;
-}
-
-.room .time {
-  @apply text-xs text-blue-900 text-start truncate;
-}
-
-.room.room.selected .time {
-  @apply text-white;
-}
-
-.room .badge {
-  @apply text-white text-xs truncate w-5 h-5 flex items-center justify-center rounded-full bg-red-400;
-}
-
-.room.selected .badge {
-  @apply bg-blue-200 text-gray-900;
-}
-
 .reply-button {
   @apply invisible text-xl text-gray-500 hover:text-gray-800;
 }
