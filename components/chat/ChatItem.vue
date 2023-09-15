@@ -32,7 +32,7 @@
         <span
           v-if="isSender"
           :class="[chat.isSeen ? 'i-mdi-check-all' : 'i-mdi-check']"
-          class="absolute bottom-1 -right-[5px]"
+          class="absolute bottom-1 -right-[5px] text-blue-200"
         ></span>
       </div>
     </div>

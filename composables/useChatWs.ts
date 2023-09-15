@@ -1,4 +1,4 @@
-import { ChatRoomIdDto, CreateChatDto } from "types"
+import { ChatRoomIdDto, CreateChatDto, JoinChatRoomDto } from "types"
 
 export const useChatWs = () => {
      const { $socketIo } = useNuxtApp()
@@ -11,5 +11,15 @@ export const useChatWs = () => {
           return $socketIo.emit(ChatSocketEvents.Seen, data)
      }
 
-     return { emitSendMessageEvent, emitMessageSeenEvent }
+     const joinChatRoom = async (data: JoinChatRoomDto) => {
+          return $socketIo.emit(ChatSocketEvents.JoinChatRoom, {
+               recipientId: data.recipientId,
+          });
+     };
+
+     const leaveChatRoom = async (chatRoomId: string) => {
+          return $socketIo.emit(ChatSocketEvents.leaveChatRoom, { chatRoomId });
+     };
+
+     return { emitSendMessageEvent, emitMessageSeenEvent, joinChatRoom, leaveChatRoom }
 }

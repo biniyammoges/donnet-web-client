@@ -65,6 +65,7 @@
 
     <!-- chats -->
     <div
+      ref="chatContainer"
       :class="{
         'hidden 2md:block': !selectedRoom,
       }"
@@ -102,7 +103,7 @@
           </div>
         </div>
         <!-- conversations -->
-        <div class="px-7 pt-14 pb-20 h-full flex flex-col">
+        <div class="px-7 py-5 h-full flex flex-col">
           <ChatItem
             v-for="chat of selectedRoom?.chats"
             :chat="chat"
@@ -121,6 +122,7 @@
         </button>
 
         <input
+          ref="messageInput"
           type="text"
           v-model="message"
           class="resize-none w-full bg-transparent py-3 text-gray-600 outline-none pr-2 placeholder:text-gray-500"
@@ -140,12 +142,17 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { ChatEntity, ChatRoomEntity, JoinChatRoomDto } from "types";
+import { ChatEntity, ChatRoomEntity } from "types";
 
 const { $socketIo } = useNuxtApp();
 
 const { fetchChatRooms, fetchChats } = useChatApi();
-const { emitSendMessageEvent, emitMessageSeenEvent } = useChatWs();
+const {
+  emitSendMessageEvent,
+  emitMessageSeenEvent,
+  joinChatRoom,
+  leaveChatRoom,
+} = useChatWs();
 
 const { setCollapsed } = useSidebarStore();
 const authStore = useAuthStore();
@@ -155,6 +162,8 @@ const route = useRoute();
 
 const keyword = ref("");
 const message = ref("");
+const chatContainer = ref<HTMLDivElement | null>(null);
+const messageInput = ref<HTMLInputElement | null>(null);
 
 const rooms = ref<ChatRoomEntity[]>([]);
 const selectedRoom = ref<ChatRoomEntity | null>(null);
@@ -176,32 +185,23 @@ const selectRoom = (room?: ChatRoomEntity) => {
     router.push("/message");
   }
 };
+const scrollToBottom = () => {
+  if (chatContainer.value) {
+    chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+  }
+};
+
 const callRoomsApi = async () => {
   roomsLoading.value = true;
   const res = await fetchChatRooms();
   roomsLoading.value = false;
 
   if (res.data) {
-    rooms.value = res.data.value?.data ?? [];
+    rooms.value = (res.data.value?.data ?? []).map((r) => ({
+      ...r,
+      lastChat: r.chats![0],
+    }));
   }
-};
-
-const joinChatRoom = async (data: JoinChatRoomDto) => {
-  await $socketIo.emit(
-    ChatSocketEvents.JoinChatRoom,
-    {
-      recipientId: data.recipientId,
-    },
-    (resp: any) => console.log(resp)
-  );
-};
-
-const leaveChatRoom = async (chatRoomId: string) => {
-  await $socketIo.emit(
-    ChatSocketEvents.leaveChatRoom,
-    { chatRoomId },
-    (resp: any) => console.log(resp)
-  );
 };
 
 const callChatsApi = async (roomId: string) => {
@@ -211,23 +211,75 @@ const callChatsApi = async (roomId: string) => {
 
   if (res.data.value?.data?.length) {
     selectedRoom.value!.chats = res.data.value?.data;
-    emitMessageSeenEvent({ chatRoomId: selectedRoom.value?.id! });
-    selectedRoom.value!.unreadCount = 0;
+
+    // emits seen event if has unread message
+    if (selectedRoom.value?.unreadCount) {
+      emitMessageSeenEvent({ chatRoomId: selectedRoom.value?.id! });
+      selectedRoom.value!.unreadCount = 0;
+    }
   }
 };
 
 const listenForSocketEvents = () => {
-  $socketIo.on(ChatSocketEvents.JoinedChatRoom, (ack: { roomId: string }) => {
-    console.log("Joined room", ack.roomId);
+  $socketIo.on(ChatSocketEvents.JoinedChatRoom, (data: ChatRoomEntity) => {
+    if (selectedRoom.value?.id !== data?.id && route.query?.uid) {
+      selectedRoom.value = data;
+    }
   });
 
   $socketIo.on(ChatSocketEvents.leftChatRoom, (d) => {
     console.log("left room", d);
   });
 
+  // new message event
   $socketIo.on(ChatSocketEvents.NewMessage, (data: ChatEntity) => {
-    syncAddedMessage(data);
+    if (selectedRoom.value) {
+      syncSentMessage(data);
+
+      if (selectedRoom.value.id === data.chatRoomId) {
+        emitMessageSeenEvent({ chatRoomId: selectedRoom.value?.id! });
+      }
+      scrollToBottom();
+    }
+
+    // update rooms
+    else {
+      const room = rooms.value.find((r) => r.id === data.chatRoomId);
+
+      if (room) {
+        room.unreadCount = room.unreadCount! + 1;
+        room.lastChat = data;
+        moveRoomToTop(room);
+      } else {
+        if (data.chatRoom) {
+          rooms.value.unshift({ ...data.chatRoom!, lastChat: data });
+        }
+      }
+    }
   });
+
+  // message seen event
+  $socketIo.on(
+    ChatSocketEvents.Seen,
+    (data: { chatRoomId: string; seenCount: number }) => {
+      const room = rooms.value.find((r) => r.id === data.chatRoomId);
+
+      if (room) {
+        room.unreadCount = 0;
+        room.lastChat!.isSeen = true;
+
+        // update message's seen status
+        if (selectedRoom.value) {
+          const unreadMessages = selectedRoom.value.chats?.filter(
+            (c) => !c.isSeen
+          );
+          for (const m of unreadMessages ?? []) {
+            m.isSeen = true;
+          }
+        }
+      }
+    }
+  );
 };
 
 watch(selectedRoom, async (newVal, oldVal) => {
@@ -238,6 +290,10 @@ watch(selectedRoom, async (newVal, oldVal) => {
     });
 
     await callChatsApi(newVal?.id!);
+    scrollToBottom();
+    if (messageInput.value) {
+      messageInput.value.focus();
+    }
   }
 
   if (oldVal) {
@@ -253,31 +309,46 @@ const sendMessage = async () => {
       ...(selectedRoom.value?.id && { chatRoomId: selectedRoom.value.id }),
     });
 
-    syncAddedMessage({
+    syncSentMessage({
       message: message.value,
       sender: { ...user.value },
       senderId: user.value?.id,
       createdAt: new Date(),
-      ...(selectedRoom.value?.id && { chatRoomId: selectedRoom.value.id }),
+      ...(selectedRoom.value?.id && {
+        chatRoomId: selectedRoom.value.id,
+        chatRoom: selectedRoom.value,
+      }),
     });
+
     message.value = "";
+    if (messageInput.value) {
+      messageInput.value.focus();
+    }
+    scrollToBottom();
   }
 };
 
-const syncAddedMessage = (data: ChatEntity) => {
+const syncSentMessage = (data: ChatEntity) => {
   if (selectedRoom.value && selectedRoom.value.id === data.chatRoomId) {
+    selectedRoom.value.lastChat = data;
     selectedRoom.value.chats?.push(data);
-    updateRoomIdx(selectedRoom.value?.id!);
+    moveRoomToTop(selectedRoom.value);
   }
 };
 
-const updateRoomIdx = (id: string) => {
-  const idx = rooms.value.findIndex((r) => r.id === id);
-  if (idx) {
+const moveRoomToTop = (chatRoom: ChatRoomEntity) => {
+  const idx = rooms.value.findIndex((r) => r?.id === chatRoom?.id);
+
+  // if room exist, then it moves the room to top or first order
+  if (idx > -1) {
     const room = rooms.value[idx];
-    const restRooms = rooms.value.filter((r) => r.id !== id);
+    const restRooms = rooms.value.filter((r) => r?.id !== chatRoom?.id);
 
     rooms.value = [room, ...restRooms];
+  }
+  // else it adds new one into the rooms list
+  else {
+    rooms.value.unshift(chatRoom);
   }
 };
 

@@ -17,24 +17,28 @@
       </div>
 
       <div
-        :class="{ 'justify-center': !lastChat }"
+        :class="{ 'justify-center': !room?.lastChat }"
         class="flex-1 flex flex-col w-full 2md:max-w-[200px] lg:max-w-[260px]"
       >
         <p class="name">
           {{ recipent?.firstName + " " + recipent?.lastName }}
         </p>
         <p
-          v-if="lastChat"
-          :class="{ 'font-bold text-gray-800': !isSender && !lastChat.isSeen }"
+          v-if="room?.lastChat"
+          :class="[
+            !isSender && !room?.lastChat.isSeen
+              ? 'text-gray-900'
+              : ' text-gray-500',
+          ]"
           class="message text-start"
         >
-          <span v-if="isSender" class="font-bold">you:</span>
-          {{ lastChat?.message }}
+          <span v-if="isSender">You:</span>
+          {{ room?.lastChat?.message }}
         </p>
       </div>
       <div class="shrink-0 flex flex-col justify-between items-center ml-auto">
         <div class="relative">
-          <p v-if="lastChat" class="time absolute right-0">
+          <p v-if="room?.lastChat" class="time absolute right-0">
             {{ dateToTimeAgo(new Date()) }}
           </p>
         </div>
@@ -76,10 +80,9 @@ const emits = defineEmits<SelectRoomEvent>();
 const recipent = computed(() => {
   return props.room?.chatUsers?.length ? props.room?.chatUsers[0].user : null;
 });
-const lastChat = computed(() =>
-  props.room?.chats?.length ? props.room.chats[0] : null
+const isSender = computed(
+  () => props.room?.lastChat?.senderId === user.value?.id
 );
-const isSender = computed(() => lastChat.value?.senderId === user.value?.id);
 </script>
 
 <style scoped>
@@ -108,7 +111,7 @@ const isSender = computed(() => lastChat.value?.senderId === user.value?.id);
 }
 
 .room .message {
-  @apply text-gray-500 text-sm truncate;
+  @apply text-sm truncate;
 }
 
 .room.selected .message {

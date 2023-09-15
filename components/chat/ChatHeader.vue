@@ -32,7 +32,7 @@
           {{
             recipient?.isOnline
               ? "Active now"
-              : `Last seen ${dateToTimeAgo(recipient?.lastSeen ?? new Date())} `
+              : `Last seen ${dateToTimeAgo(new Date())} `
           }}
         </p>
       </div>
