@@ -16,18 +16,38 @@
         </div>
       </div>
 
-      <div class="flex-1 w-full 2md:max-w-[200px] lg:max-w-[260px]">
+      <div
+        :class="{ 'justify-center': !lastChat }"
+        class="flex-1 flex flex-col w-full 2md:max-w-[200px] lg:max-w-[260px]"
+      >
         <p class="name">
           {{ recipent?.firstName + " " + recipent?.lastName }}
         </p>
-        <p class="message text-start">
-          <span v-if="isSender" class="font-medium">you:</span> Hi biniyam, hope
-          this message finds you well
+        <p
+          v-if="lastChat"
+          :class="{ 'font-bold text-gray-800': !isSender && !lastChat.isSeen }"
+          class="message text-start"
+        >
+          <span v-if="isSender" class="font-bold">you:</span>
+          {{ lastChat?.message }}
         </p>
       </div>
       <div class="shrink-0 flex flex-col justify-between items-center ml-auto">
-        <p class="time">{{ dateToTimeAgo(lastChat.createdAt) }}</p>
+        <div class="relative">
+          <p v-if="lastChat" class="time absolute right-0">
+            {{ dateToTimeAgo(new Date()) }}
+          </p>
+        </div>
         <p v-if="room?.unreadCount" class="badge">{{ room?.unreadCount }}</p>
+        <p
+          v-else-if="isSender && room.chats?.length"
+          class="message-seen-status"
+        >
+          <span
+            :class="[room.chats[0].isSeen ? 'i-mdi-check-all' : 'i-mdi-check']"
+            class=""
+          ></span>
+        </p>
       </div>
     </div>
   </button>
@@ -56,10 +76,10 @@ const emits = defineEmits<SelectRoomEvent>();
 const recipent = computed(() => {
   return props.room?.chatUsers?.length ? props.room?.chatUsers[0].user : null;
 });
-const isSender = computed(() => recipent.value?.id === user.value?.id);
 const lastChat = computed(() =>
-  props.room?.chats?.length ? props.room.chats[0] : {}
+  props.room?.chats?.length ? props.room.chats[0] : null
 );
+const isSender = computed(() => lastChat.value?.senderId === user.value?.id);
 </script>
 
 <style scoped>
@@ -109,5 +129,13 @@ const lastChat = computed(() =>
 
 .room.selected .badge {
   @apply bg-blue-200 text-gray-900;
+}
+
+.room .message-seen-status {
+  @apply text-gray-500;
+}
+
+.room.selected .message-seen-status {
+  @apply text-blue-100;
 }
 </style>

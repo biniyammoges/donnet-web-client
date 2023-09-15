@@ -1,12 +1,12 @@
 <template>
-  <div class="flex gap-x-5">
+  <div class="flex gap-x-5 h-screen">
     <!-- chatrooms -->
     <div
       :class="{ 'hidden 2md:block': selectedRoom }"
-      class="relative w-full 2md:w-[350px] lg:w-[400px] h-screen overflow-y-auto bg-white shrink-0"
+      class="relative w-full 2md:w-[350px] lg:w-[400px] overflow-y-auto bg-white shrink-0 border-x-[0.5px] border-x-gray-300"
     >
       <div class="sticky top-0 z-40 bg-white w-full py-6">
-        <h1 class="text-2xl px-5 font-bold mb-3 text-gray-600">Messages</h1>
+        <h1 class="text-2xl px-5 font-bold mb-3 text-gray-800">Messages</h1>
 
         <!-- search -->
         <div
@@ -20,7 +20,7 @@
           />
 
           <span
-            @click.stop="clear"
+            @click.stop="clearSearchInput"
             v-if="keyword.length"
             class="mr-3 text-gray-400 hover:text-gray-700 flex items-center gap-x-1 text-lg i-mdi-close"
           ></span>
@@ -28,9 +28,32 @@
       </div>
 
       <!-- rooms -->
-      <div class="h-full">
+      <div>
         <div class="px-2">
+          <div
+            v-if="roomsLoading && !rooms.length"
+            class="flex items-center justify-center flex-col py-4"
+          >
+            <img class="w-9" src="~/assets/images/loader.svg" alt="" />
+            <h1 class="text-gray-500">Loading chat rooms..</h1>
+          </div>
+          <div
+            v-if="!roomsLoading && !rooms.length"
+            class="text-center mx-auto max-w-xs"
+          >
+            <h1 class="text-gray-800 text-xl font-bold">No chat history yet</h1>
+            <p class="text-gray-700">
+              Send Message to your friends And Also You can share Photos
+            </p>
+            <button
+              class="bg-blue-600 text-white py-2 px-4 rounded-full mt-2 2md:hidden"
+            >
+              Find new friends
+            </button>
+          </div>
           <ChatRoom
+            @on-select="selectRoom"
+            v-else
             v-for="room of rooms"
             :room="room"
             :selected="selectedRoom?.id === room?.id"
@@ -42,8 +65,10 @@
 
     <!-- chats -->
     <div
-      :class="{ 'hidden 2md:block': !selectedRoom }"
-      class="relative bg-white w-full max-h-screen overflow-y-auto"
+      :class="{
+        'hidden 2md:block': !selectedRoom,
+      }"
+      class="relative bg-white w-full overflow-y-auto"
     >
       <div v-if="!selectedRoom" class="flex items-center justify-center h-full">
         <div class="text-center">
@@ -59,18 +84,25 @@
           </button>
         </div>
       </div>
-      <div v-else class="h-full relative overflow-y-auto">
+      <div v-else class="relative">
         <!-- header -->
-        <ChatHeader
-          :recipient="
-            selectedRoom?.chatUsers?.length
-              ? selectedRoom?.chatUsers[0].user
-              : null
-          "
-        />
+        <ChatHeader @on-room-close="resetSelectedRoom" :recipient="recipient" />
 
+        <div
+          v-if="!chatsLoading && !hasRecentChats"
+          class="text-center h-[80vh] overflow-y-auto m-auto max-w-xs flex items-center"
+        >
+          <div>
+            <h1 class="text-gray-800 text-xl font-bold">
+              No conversations yet
+            </h1>
+            <p class="text-gray-700">
+              Send Message to your friends And Also You can share Photos
+            </p>
+          </div>
+        </div>
         <!-- conversations -->
-        <div class="p-7 h-full flex flex-col items-start">
+        <div class="px-7 pt-14 pb-20 h-full flex flex-col">
           <ChatItem
             v-for="chat of selectedRoom?.chats"
             :chat="chat"
@@ -82,7 +114,7 @@
       <!-- Write Message -->
       <div
         v-if="selectedRoom"
-        class="absolute bottom-0 overflow-hidden min-h-[55px] max-h-[120px] bg-[#F0F2F5] flex items-center w-full z-50 px-4"
+        class="sticky bottom-0 overflow-hidden min-h-[55px] max-h-[120px] bg-[#F0F2F5] flex items-center w-full z-50 px-4"
       >
         <button class="text-2xl h-6 text-gray-500 hover:text-gray-600 px-2">
           <span class="i-mdi-emoji-outline"></span>
@@ -96,6 +128,7 @@
         />
 
         <button
+          @click="sendMessage"
           class="text-sm rounded-lg px-2 bg-blue-600 text-white right-2 h-9 mr-2"
         >
           Send
@@ -107,164 +140,161 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { ChatRoomEntity } from "types";
+import { ChatEntity, ChatRoomEntity, JoinChatRoomDto } from "types";
+
+const { $socketIo } = useNuxtApp();
+
+const { fetchChatRooms, fetchChats } = useChatApi();
+const { emitSendMessageEvent, emitMessageSeenEvent } = useChatWs();
 
 const { setCollapsed } = useSidebarStore();
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
 const router = useRouter();
+const route = useRoute();
 
 const keyword = ref("");
 const message = ref("");
 
 const rooms = ref<ChatRoomEntity[]>([]);
 const selectedRoom = ref<ChatRoomEntity | null>(null);
-const roomLoading = ref(true);
+const roomsLoading = ref(true);
+const chatsLoading = ref(false);
 
-const textAreaRef = ref<HTMLTextAreaElement | null>(null);
+const recipient = computed(() =>
+  selectedRoom.value?.chatUsers?.length
+    ? selectedRoom.value?.chatUsers[0].user!
+    : {}
+);
+const hasRecentChats = computed(() => selectedRoom.value?.chats?.length);
 
-var chats = [
-  {
-    id: 0,
-    text: "Hi 🖐",
-    side: 1,
-  },
-  {
-    id: 1,
-    text: "Hello! How can I assist you today?",
-    reply: {
-      text: "Hi 🖐",
-    },
-    side: 0,
-  },
-  {
-    id: 2,
-    text: "I have a question about your products.",
-    side: 1,
-  },
-  {
-    id: 3,
-    text: "Sure, feel free to ask. I'm here to help!",
-    side: 0,
-  },
-  {
-    id: 4,
-    reply: {
-      text: "Sure, feel free to ask. I'm here to help!",
-    },
-    text: "Can you tell me more about the warranty?",
-    side: 1,
-  },
-  {
-    id: 5,
-    text: "Of course! Our products come with a one-year warranty that covers manufacturing defects. If you experience any issues, we'll be happy to assist you with repairs or replacements.",
-    side: 0,
-  },
-  {
-    id: 6,
-    reply: {
-      text: "Of course! Our products come with a one-year warranty that covers manufacturing defects. If you experience any issues, we'll be happy to assist you with repairs or replacements.",
-    },
-    text: "That sounds great. Thank you!",
-    side: 1,
-  },
-  {
-    id: 7,
-    reply: { text: "That sounds great. Thank you!" },
-    text: "You're welcome! If you have any more questions, feel free to ask.",
-    side: 0,
-  },
-  {
-    id: 8,
-    text: "Hello, may I speak to your manager?",
-    side: 1,
-  },
-  {
-    id: 9,
-    text: "Certainly! Let me connect you with my manager.",
-    side: 0,
-  },
-  {
-    id: 10,
-    text: "Hi, I'm the manager. How can I assist you?",
-    side: 0,
-  },
-  {
-    id: 11,
-    text: "I have a concern regarding my recent order.",
-    side: 1,
-  },
-  {
-    id: 12,
-    reply: { text: "I have a concern regarding my recent order." },
-    text: "I apologize for the inconvenience. Please provide me with your order details, and I'll look into it right away.",
-    side: 0,
-  },
-  {
-    id: 13,
-    reply: {
-      text: "I apologize for the inconvenience. Please provide me with your order details, and I'll look into it right away.",
-    },
-    text: "Thank you for your prompt assistance.",
-    side: 1,
-  },
-  {
-    id: 14,
-    reply: { text: "Thank you for your prompt assistance." },
-    text: "You're welcome! We aim to provide the best customer service experience. Is there anything else I can help you with?",
-    side: 0,
-  },
-  {
-    id: 15,
-    text: "Can you recommend any similar products?",
-    side: 1,
-  },
-  {
-    id: 16,
-    text: "Certainly! We have a wide range of similar products that I can recommend based on your preferences. Could you please provide me with more details?",
-    side: 0,
-  },
-  {
-    id: 17,
-    text: "I'm looking for a product with specific features and a moderate price range.",
-    side: 1,
-  },
-  {
-    id: 18,
-    text: "Noted. Let me gather some options for you. It may take a moment.",
-    side: 0,
-  },
-  {
-    id: 19,
-    text: "Thank you for your help! I'll wait for your recommendations. I apologize for the inconvenience. Please provide me with your order details, and I'll look into it right away.",
-    side: 1,
-  },
-];
+const resetSelectedRoom = () => (selectedRoom.value = null);
+const clearSearchInput = () => (keyword.value = "");
+const selectRoom = (room?: ChatRoomEntity) => {
+  if (room) {
+    selectedRoom.value = room;
+    router.push("/message");
+  }
+};
+const callRoomsApi = async () => {
+  roomsLoading.value = true;
+  const res = await fetchChatRooms();
+  roomsLoading.value = false;
 
-// Handles textarea height as user enter the text
-const handleTextAreaHeight = (e: Event) => {
-  const scrollHeight = textAreaRef.value?.scrollHeight ?? 0;
-  textAreaRef.value!.style.height = "auto";
-  textAreaRef.value!.style.height = scrollHeight + "px";
+  if (res.data) {
+    rooms.value = res.data.value?.data ?? [];
+  }
 };
 
-const clear = () => (keyword.value = "");
+const joinChatRoom = async (data: JoinChatRoomDto) => {
+  await $socketIo.emit(
+    ChatSocketEvents.JoinChatRoom,
+    {
+      recipientId: data.recipientId,
+    },
+    (resp: any) => console.log(resp)
+  );
+};
 
-onMounted(() => {
+const leaveChatRoom = async (chatRoomId: string) => {
+  await $socketIo.emit(
+    ChatSocketEvents.leaveChatRoom,
+    { chatRoomId },
+    (resp: any) => console.log(resp)
+  );
+};
+
+const callChatsApi = async (roomId: string) => {
+  chatsLoading.value = true;
+  const res = await fetchChats(roomId);
+  chatsLoading.value = false;
+
+  if (res.data.value?.data?.length) {
+    selectedRoom.value!.chats = res.data.value?.data;
+    emitMessageSeenEvent({ chatRoomId: selectedRoom.value?.id! });
+    selectedRoom.value!.unreadCount = 0;
+  }
+};
+
+const listenForSocketEvents = () => {
+  $socketIo.on(ChatSocketEvents.JoinedChatRoom, (ack: { roomId: string }) => {
+    console.log("Joined room", ack.roomId);
+  });
+
+  $socketIo.on(ChatSocketEvents.leftChatRoom, (d) => {
+    console.log("left room", d);
+  });
+
+  $socketIo.on(ChatSocketEvents.NewMessage, (data: ChatEntity) => {
+    syncAddedMessage(data);
+  });
+};
+
+watch(selectedRoom, async (newVal, oldVal) => {
+  if (newVal) {
+    await joinChatRoom({
+      chatRoomId: newVal.id,
+      recipientId: newVal?.chatUsers![0].userId!,
+    });
+
+    await callChatsApi(newVal?.id!);
+  }
+
+  if (oldVal) {
+    await leaveChatRoom(oldVal?.id!);
+  }
+});
+
+const sendMessage = async () => {
+  if (message.value && recipient.value.id) {
+    await emitSendMessageEvent({
+      message: message.value,
+      reciepenId: recipient.value.id,
+      ...(selectedRoom.value?.id && { chatRoomId: selectedRoom.value.id }),
+    });
+
+    syncAddedMessage({
+      message: message.value,
+      sender: { ...user.value },
+      senderId: user.value?.id,
+      createdAt: new Date(),
+      ...(selectedRoom.value?.id && { chatRoomId: selectedRoom.value.id }),
+    });
+    message.value = "";
+  }
+};
+
+const syncAddedMessage = (data: ChatEntity) => {
+  if (selectedRoom.value && selectedRoom.value.id === data.chatRoomId) {
+    selectedRoom.value.chats?.push(data);
+    updateRoomIdx(selectedRoom.value?.id!);
+  }
+};
+
+const updateRoomIdx = (id: string) => {
+  const idx = rooms.value.findIndex((r) => r.id === id);
+  if (idx) {
+    const room = rooms.value[idx];
+    const restRooms = rooms.value.filter((r) => r.id !== id);
+
+    rooms.value = [room, ...restRooms];
+  }
+};
+
+onMounted(async () => {
+  await nextTick();
   setCollapsed(true);
+
+  const uid = route.query?.uid as string;
+
+  await Promise.all([
+    callRoomsApi(),
+    listenForSocketEvents(),
+    ...(uid ? [joinChatRoom({ recipientId: uid })] : []),
+  ]);
 });
 
 onUnmounted(() => {
   setCollapsed(false);
 });
 </script>
-
-<style scoped>
-.reply-button {
-  @apply invisible text-xl text-gray-500 hover:text-gray-800;
-}
-
-.chat:hover .reply-button {
-  @apply visible;
-}
-</style>

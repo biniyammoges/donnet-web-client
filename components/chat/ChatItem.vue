@@ -1,14 +1,14 @@
 <template>
   <div
-    :class="[isSender ? '' : 'self-end flex-row-reverse']"
+    :class="[!isSender ? '' : 'self-end flex-row-reverse']"
     class="chat flex w-auto"
   >
     <div
-      :class="[isSender ? 'mr-2 ' : 'bg-blue-600 text-white ml-2 ']"
+      :class="[!isSender ? 'mr-2 ' : 'bg-blue-600 text-white ml-2 ']"
       class="bg-blue-100 relative py-2 rounded-lg px-3 w-auto mb-2 max-w-[500px]"
     >
       <div
-        :class="[isSender ? '-left-1' : '-right-1 bg-blue-600']"
+        :class="[!isSender ? '-left-1' : '-right-1 bg-blue-600']"
         class="absolute w-4 h-4 bg-blue-100 rotate-45 top-[6px]"
       ></div>
 
@@ -16,7 +16,7 @@
       <div
         v-if="chat.parentChat"
         :class="[
-          isSender ? 'text-gray-900 border-l-gray-700 ' : 'text-blue-100 ',
+          !isSender ? 'text-gray-900 border-l-gray-700 ' : 'text-blue-100 ',
         ]"
         class="border-l-[2px] py-1 my-1 cursor-pointer"
       >
@@ -25,7 +25,16 @@
         </p>
       </div>
 
-      <p>{{ chat.message }}</p>
+      <div class="flex items-center gap-x-1 relative pr-4">
+        <p>
+          {{ chat.message }}
+        </p>
+        <span
+          v-if="isSender"
+          :class="[chat.isSeen ? 'i-mdi-check-all' : 'i-mdi-check']"
+          class="absolute bottom-1 -right-[5px]"
+        ></span>
+      </div>
     </div>
 
     <!-- reply button -->
@@ -50,5 +59,15 @@ const props = defineProps({
   },
 });
 
-const isSender = computed(() => props.chat?.sender?.id === user?.value?.id);
+const isSender = computed(() => props.chat?.senderId === user?.value?.id);
 </script>
+
+<style scoped>
+.reply-button {
+  @apply invisible text-xl text-gray-500 hover:text-gray-800;
+}
+
+.chat:hover .reply-button {
+  @apply visible;
+}
+</style>
