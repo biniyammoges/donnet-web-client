@@ -103,7 +103,7 @@
           </div>
         </div>
         <!-- conversations -->
-        <div class="px-7 pt-5 pb-12 h-full flex flex-col">
+        <div class="px-7 pt-5 pb-12 min-h-[90vh] flex flex-col">
           <ChatItem
             v-for="chat of selectedRoom?.chats"
             :chat="chat"
@@ -144,6 +144,7 @@
         <input
           ref="messageInput"
           type="text"
+          @input="handleTyping"
           v-model="message"
           class="resize-none w-full bg-transparent py-3 text-gray-600 outline-none pr-2 placeholder:text-gray-500"
           :placeholder="`Write message here...`"
@@ -162,7 +163,13 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { ChatEntity, ChatRoomEntity, SocketOnlineStatusEvents } from "~/types";
+import { CLIENT_RENEG_LIMIT } from "tls";
+import {
+  ChatEntity,
+  ChatRoomEntity,
+  SocketOnlineStatusEvents,
+  TypingDto,
+} from "~/types";
 
 const { $socketIo } = useNuxtApp();
 
@@ -172,6 +179,8 @@ const {
   emitMessageSeenEvent,
   joinChatRoom,
   leaveChatRoom,
+  emitTypingEvent,
+  emitTypingStoppedEvent,
 } = useChatWs();
 
 const { setCollapsed } = useSidebarStore();
@@ -190,6 +199,7 @@ const selectedRoom = ref<ChatRoomEntity | null>(null);
 const selectedReply = ref<ChatEntity | null>(null);
 const roomsLoading = ref(true);
 const chatsLoading = ref(false);
+const typingTimer = ref<NodeJS.Timeout | null>(null);
 
 const recipient = computed(() =>
   selectedRoom.value?.chatUsers?.length
@@ -218,6 +228,27 @@ const scrollToBottom = () => {
 const reply = (chat: ChatEntity) => {
   selectedReply.value = chat;
   messageInput.value?.focus();
+};
+
+const handleTyping = async (e: Event) => {
+  if (typingTimer.value) {
+    clearTimeout(typingTimer.value);
+  }
+
+  await emitTypingEvent({
+    chatRoomId: selectedRoom.value?.id!,
+    recipientId: recipient.value.id!,
+  });
+
+  // emits typingStopped even after after one sec, user stops typing
+  typingTimer.value = setTimeout(
+    () =>
+      emitTypingStoppedEvent({
+        chatRoomId: selectedRoom.value?.id!,
+        recipientId: recipient.value.id!,
+      }),
+    1000
+  );
 };
 
 const callRoomsApi = async () => {
@@ -332,6 +363,34 @@ const listenForSocketEvents = () => {
       room.chatUsers![0].user!.lastSeen = new Date().toISOString();
     }
   });
+
+  const updateTypingStatus = (
+    data: TypingDto & { typerId: string },
+    isTyping = false
+  ) => {
+    const roomIdx = rooms.value.findIndex((r) => r?.id === data?.chatRoomId);
+
+    if (roomIdx > -1) {
+      const room = rooms.value[roomIdx];
+      const chatUserIdx = room.chatUsers!.findIndex(
+        (cu) => cu?.userId === data.typerId
+      );
+
+      if (chatUserIdx > -1) {
+        room.chatUsers![chatUserIdx].user!.isTyping = isTyping;
+      }
+    }
+  };
+
+  $socketIo.on(
+    ChatSocketEvents.Typing,
+    (data: TypingDto & { typerId: string }) => updateTypingStatus(data, true)
+  );
+
+  $socketIo.on(
+    ChatSocketEvents.StoppedTyping,
+    (data: TypingDto & { typerId: string }) => updateTypingStatus(data)
+  );
 };
 
 watch(selectedRoom, async (newVal, oldVal) => {
@@ -423,5 +482,9 @@ onMounted(async () => {
 
 onUnmounted(() => {
   setCollapsed(false);
+});
+
+useHead({
+  title: "Messages",
 });
 </script>

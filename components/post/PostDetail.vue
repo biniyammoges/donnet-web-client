@@ -54,10 +54,6 @@
                   )
                 }}
               </div>
-              <span
-                v-if="post?.creator?.isOnline"
-                class="h-2 w-2 top-1 -right-1 absolute rounded-full bg-green-500"
-              ></span>
             </nuxt-link>
             <div class="flex flex-col justify-center">
               <nuxt-link
@@ -67,7 +63,7 @@
                   post.creator?.firstName + " " + post.creator?.lastName
                 }}</nuxt-link
               >
-              <p class="text-gray-400 text-xs leading-5">
+              <p v-if="post.createdAt" class="text-gray-400 text-xs leading-5">
                 {{ dateToTimeAgo(new Date(post?.createdAt)) }}
               </p>
             </div>

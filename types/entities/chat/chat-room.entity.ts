@@ -13,6 +13,7 @@ export class ChatRoomEntity extends BaseEntity {
      chatUsers?: ChatUserEntity[]
      unreadCount?: number
      lastChat?: ChatEntity
+     typing?: boolean
 
      constructor(data?: ChatRoomEntity) {
           super()

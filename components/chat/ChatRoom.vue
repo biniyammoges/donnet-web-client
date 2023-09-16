@@ -3,8 +3,8 @@
     <div class="profile flex">
       <div class="avatar">
         <img
-          v-if="recipent?.avatar?.url"
-          :src="recipent.avatar.url"
+          v-if="recipient?.avatar?.url"
+          :src="recipient.avatar.url"
           alt="image"
           class="h-full w-full rounded-full object-cover border border-yellow-500"
         />
@@ -12,26 +12,29 @@
           v-else
           class="w-10 h-10 rounded-full border text-gray-500 border-gray-500 flex items-center justify-center"
         >
-          {{ joinFirstCharacters(recipent?.firstName, recipent?.lastName) }}
+          {{ joinFirstCharacters(recipient?.firstName, recipient?.lastName) }}
         </div>
         <span
-          :class="[recipent?.isOnline ? 'bg-green-500' : 'bg-gray-300']"
+          :class="[recipient?.isOnline ? 'bg-green-500' : 'bg-gray-300']"
           class="h-[11px] w-[11px] bottom-1 -right-[1px] absolute rounded-full"
         ></span>
       </div>
 
       <div
-        :class="{ 'justify-center': !room?.lastChat }"
+        :class="{ 'justify-centers items-start': !room?.lastChat }"
         class="flex-1 flex flex-col w-[50%] 2md:max-w-[200px] lg:max-w-[260px]"
       >
         <p
           :class="{ 'font-medium': !isSender && !room.lastChat?.isSeen }"
           class="name"
         >
-          {{ recipent?.firstName + " " + recipent?.lastName }}
+          {{ recipient?.firstName + " " + recipient?.lastName }}
+        </p>
+        <p class="text-sm text-gray-500 text-start" v-if="recipient?.isTyping">
+          Typing...
         </p>
         <p
-          v-if="room?.lastChat"
+          v-else-if="!recipient?.isTyping && room?.lastChat"
           :class="[
             !isSender && !room?.lastChat?.isSeen
               ? 'text-gray-900 font-semibold'
@@ -86,7 +89,7 @@ const props = defineProps({
 
 const emits = defineEmits<SelectRoomEvent>();
 
-const recipent = computed(() => {
+const recipient = computed(() => {
   return props.room?.chatUsers?.length ? props.room?.chatUsers[0].user : null;
 });
 const isSender = computed(

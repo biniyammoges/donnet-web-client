@@ -23,6 +23,7 @@ export class User extends BaseEntity {
      followerCount?: number
      followingCount?: number
      following?: boolean
+     isTyping?: boolean
 
      constructor(data?: Partial<User>) {
           super()

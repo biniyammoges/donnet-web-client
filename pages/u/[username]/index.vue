@@ -290,6 +290,11 @@ const callUserApi = async () => {
 
   if (data.value) {
     foundUser.value = data.value;
+    useHead({
+      title: foundUser.value
+        ? `${foundUser.value.firstName} ${foundUser.value.lastName}`
+        : "Profile",
+    });
   }
 };
 
