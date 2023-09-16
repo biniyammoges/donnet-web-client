@@ -20,14 +20,17 @@
         :class="{ 'justify-center': !room?.lastChat }"
         class="flex-1 flex flex-col w-full 2md:max-w-[200px] lg:max-w-[260px]"
       >
-        <p class="name">
+        <p
+          :class="{ 'font-medium': !isSender && !room.lastChat?.isSeen }"
+          class="name"
+        >
           {{ recipent?.firstName + " " + recipent?.lastName }}
         </p>
         <p
           v-if="room?.lastChat"
           :class="[
-            !isSender && !room?.lastChat.isSeen
-              ? 'text-gray-900'
+            !isSender && !room?.lastChat?.isSeen
+              ? 'text-gray-900 font-semibold'
               : ' text-gray-500',
           ]"
           class="message text-start"
@@ -38,8 +41,8 @@
       </div>
       <div class="shrink-0 flex flex-col justify-between items-center ml-auto">
         <div class="relative">
-          <p v-if="room?.lastChat" class="time absolute right-0">
-            {{ dateToTimeAgo(new Date()) }}
+          <p v-if="room?.lastChat?.createdAt" class="time absolute right-0">
+            {{ dateToTimeAgo(new Date(room?.lastChat?.createdAt)) }}
           </p>
         </div>
         <p v-if="room?.unreadCount" class="badge">{{ room?.unreadCount }}</p>
@@ -48,7 +51,9 @@
           class="message-seen-status"
         >
           <span
-            :class="[room.chats[0].isSeen ? 'i-mdi-check-all' : 'i-mdi-check']"
+            :class="[
+              room?.lastChat?.isSeen ? 'i-mdi-check-all' : 'i-mdi-check',
+            ]"
             class=""
           ></span>
         </p>

@@ -103,7 +103,7 @@
           </div>
         </div>
         <!-- conversations -->
-        <div class="px-7 py-5 h-full flex flex-col">
+        <div class="px-7 pt-5 pb-12 h-full flex flex-col">
           <ChatItem
             v-for="chat of selectedRoom?.chats"
             :chat="chat"
@@ -176,6 +176,7 @@ const recipient = computed(() =>
     : {}
 );
 const hasRecentChats = computed(() => selectedRoom.value?.chats?.length);
+const isSender = (senderId: string) => user.value?.id === senderId;
 
 const resetSelectedRoom = () => (selectedRoom.value = null);
 const clearSearchInput = () => (keyword.value = "");
@@ -215,6 +216,11 @@ const callChatsApi = async (roomId: string) => {
     // emits seen event if has unread message
     if (selectedRoom.value?.unreadCount) {
       emitMessageSeenEvent({ chatRoomId: selectedRoom.value?.id! });
+
+      // update the ui of room status
+      if (!selectedRoom.value.lastChat?.isSeen) {
+        selectedRoom.value.lastChat!.isSeen = true;
+      }
       selectedRoom.value!.unreadCount = 0;
     }
   }
@@ -234,9 +240,10 @@ const listenForSocketEvents = () => {
   // new message event
   $socketIo.on(ChatSocketEvents.NewMessage, (data: ChatEntity) => {
     if (selectedRoom.value) {
-      syncSentMessage(data);
+      syncSentMessageToSelectedRoom(data);
 
       if (selectedRoom.value.id === data.chatRoomId) {
+        selectedRoom.value.lastChat!.isSeen = true;
         emitMessageSeenEvent({ chatRoomId: selectedRoom.value?.id! });
       }
       scrollToBottom();
@@ -263,16 +270,17 @@ const listenForSocketEvents = () => {
     ChatSocketEvents.Seen,
     (data: { chatRoomId: string; seenCount: number }) => {
       const room = rooms.value.find((r) => r.id === data.chatRoomId);
-
       if (room) {
         room.unreadCount = 0;
         room.lastChat!.isSeen = true;
 
         // update message's seen status
         if (selectedRoom.value) {
+          selectedRoom.value.lastChat!.isSeen = true;
           const unreadMessages = selectedRoom.value.chats?.filter(
             (c) => !c.isSeen
           );
+
           for (const m of unreadMessages ?? []) {
             m.isSeen = true;
           }
@@ -309,7 +317,7 @@ const sendMessage = async () => {
       ...(selectedRoom.value?.id && { chatRoomId: selectedRoom.value.id }),
     });
 
-    syncSentMessage({
+    syncSentMessageToSelectedRoom({
       message: message.value,
       sender: { ...user.value },
       senderId: user.value?.id,
@@ -328,10 +336,11 @@ const sendMessage = async () => {
   }
 };
 
-const syncSentMessage = (data: ChatEntity) => {
+const syncSentMessageToSelectedRoom = (data: ChatEntity) => {
   if (selectedRoom.value && selectedRoom.value.id === data.chatRoomId) {
     selectedRoom.value.lastChat = data;
     selectedRoom.value.chats?.push(data);
+
     moveRoomToTop(selectedRoom.value);
   }
 };
