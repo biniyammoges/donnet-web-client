@@ -6,7 +6,7 @@
           v-if="recipent?.avatar?.url"
           :src="recipent.avatar.url"
           alt="image"
-          class="h-full w-full rounded-full object-cover"
+          class="h-full w-full rounded-full object-cover border border-yellow-500"
         />
         <div
           v-else
@@ -14,6 +14,10 @@
         >
           {{ joinFirstCharacters(recipent?.firstName, recipent?.lastName) }}
         </div>
+        <span
+          :class="[recipent?.isOnline ? 'bg-green-500' : 'bg-gray-300']"
+          class="h-[11px] w-[11px] bottom-1 -right-[1px] absolute rounded-full"
+        ></span>
       </div>
 
       <div

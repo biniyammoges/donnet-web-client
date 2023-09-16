@@ -18,7 +18,7 @@
         :class="[
           !isSender ? 'text-gray-900 border-l-gray-700 ' : 'text-blue-100 ',
         ]"
-        class="border-l-[2px] py-1 my-1 cursor-pointer"
+        class="border-l-[2px] py- my-1 cursor-pointer"
       >
         <p class="ml-2 truncate">{{ chat.parentChat?.sender?.firstName }}</p>
         <p class="ml-2 line-clamp-1">

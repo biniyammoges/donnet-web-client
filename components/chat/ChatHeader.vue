@@ -9,7 +9,7 @@
       <span class="i-mdi-arrow-left"></span>
     </button>
     <div class="flex items-center cursor-pointer">
-      <div class="w-10 h-10 mr-3">
+      <div class="relative w-10 h-10 mr-3">
         <img
           v-if="recipient?.avatar"
           :src="recipient.avatar.url"
@@ -22,6 +22,10 @@
         >
           {{ joinFirstCharacters(recipient?.firstName, recipient?.lastName) }}
         </div>
+        <span
+          :class="[recipient?.isOnline ? 'bg-green-500' : 'bg-gray-300']"
+          class="h-[11px] w-[11px] bottom-1 -right-[1px] absolute rounded-full"
+        ></span>
       </div>
 
       <div class="">
@@ -31,8 +35,10 @@
         <p class="text-gray-500">
           {{
             recipient?.isOnline
-              ? "Active now"
-              : `Last seen ${dateToTimeAgo(new Date())} `
+              ? "Online"
+              : recipient?.lastSeen
+              ? `Last seen ${dateToTimeAgo(new Date(recipient.lastSeen))} `
+              : ""
           }}
         </p>
       </div>

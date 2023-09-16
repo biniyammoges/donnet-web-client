@@ -162,7 +162,7 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { ChatEntity, ChatRoomEntity } from "types";
+import { ChatEntity, ChatRoomEntity, SocketOnlineStatusEvents } from "~/types";
 
 const { $socketIo } = useNuxtApp();
 
@@ -316,6 +316,22 @@ const listenForSocketEvents = () => {
       }
     }
   );
+
+  $socketIo.on(SocketOnlineStatusEvents.ONLINE, (userId: string) => {
+    const room = rooms.value.find((r) => r.chatUsers![0]?.userId === userId);
+    if (room) {
+      room.chatUsers![0].user!.isOnline = true;
+      room.chatUsers![0].user!.lastSeen = undefined;
+    }
+  });
+
+  $socketIo.on(SocketOnlineStatusEvents.OFFLINE, (userId: string) => {
+    const room = rooms.value.find((r) => r.chatUsers![0]?.userId === userId);
+    if (room) {
+      room.chatUsers![0].user!.isOnline = false;
+      room.chatUsers![0].user!.lastSeen = new Date().toISOString();
+    }
+  });
 };
 
 watch(selectedRoom, async (newVal, oldVal) => {

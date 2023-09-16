@@ -4,6 +4,11 @@ export enum SocketEvents {
      Error = 'connect_error'
 }
 
+export enum SocketOnlineStatusEvents {
+     ONLINE = 'online',
+     OFFLINE = 'offline'
+}
+
 export enum SocketPostEvents {
      NEW_POST = 'new-post',
      NEW_COMMENT = 'new-comment',
