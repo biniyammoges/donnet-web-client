@@ -20,7 +20,8 @@
         ]"
         class="border-l-[2px] py-1 my-1 cursor-pointer"
       >
-        <p class="ml-2 line-clamp-2">
+        <p class="ml-2 truncate">{{ chat.parentChat?.sender?.firstName }}</p>
+        <p class="ml-2 line-clamp-1">
           {{ chat.parentChat?.message }}
         </p>
       </div>
@@ -38,7 +39,7 @@
     </div>
 
     <!-- reply button -->
-    <button class="reply-button">
+    <button @click="emits('on-reply', chat)" class="reply-button">
       <span class="i-mdi-keyboard-return"></span>
     </button>
   </div>
@@ -46,7 +47,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { ChatEntity } from "types";
+import { ChatEntity, ReplyChatEvent } from "~/types";
 import { PropType } from "vue";
 
 const authStore = useAuthStore();
@@ -58,6 +59,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emits = defineEmits<ReplyChatEvent>();
 
 const isSender = computed(() => props.chat?.senderId === user?.value?.id);
 </script>

@@ -108,6 +108,7 @@
             v-for="chat of selectedRoom?.chats"
             :chat="chat"
             :key="chat.id"
+            @on-reply="reply"
           />
         </div>
       </div>
@@ -115,8 +116,27 @@
       <!-- Write Message -->
       <div
         v-if="selectedRoom"
-        class="sticky bottom-0 overflow-hidden min-h-[55px] max-h-[120px] bg-[#F0F2F5] flex items-center w-full z-50 px-4"
+        class="sticky bottom-0 min-h-[55px] max-h-[120px] bg-[#F0F2F5] flex items-center w-full z-50 px-4"
       >
+        <!-- reply preview -->
+        <div
+          v-if="selectedReply"
+          class="absolute left-0 bg-gray-50 -top-[55px] h-[55px] px-7 w-full border-t border-t-gray-300 flex items-center justify-between"
+        >
+          <div class="max-w-[380px] text-sm text-gray-700">
+            <p class="font-medium">
+              Repying to {{ selectedReply.sender?.firstName }}'s message
+            </p>
+            <p class="truncate">{{ selectedReply.message }}</p>
+          </div>
+          <button
+            class="flex items-center text-xl"
+            @click="selectedReply = null"
+          >
+            <span class="i-mdi-close"></span>
+          </button>
+        </div>
+
         <button class="text-2xl h-6 text-gray-500 hover:text-gray-600 px-2">
           <span class="i-mdi-emoji-outline"></span>
         </button>
@@ -167,6 +187,7 @@ const messageInput = ref<HTMLInputElement | null>(null);
 
 const rooms = ref<ChatRoomEntity[]>([]);
 const selectedRoom = ref<ChatRoomEntity | null>(null);
+const selectedReply = ref<ChatEntity | null>(null);
 const roomsLoading = ref(true);
 const chatsLoading = ref(false);
 
@@ -178,7 +199,10 @@ const recipient = computed(() =>
 const hasRecentChats = computed(() => selectedRoom.value?.chats?.length);
 const isSender = (senderId: string) => user.value?.id === senderId;
 
-const resetSelectedRoom = () => (selectedRoom.value = null);
+const resetSelectedRoom = () => {
+  selectedRoom.value = null;
+  selectedReply.value = null;
+};
 const clearSearchInput = () => (keyword.value = "");
 const selectRoom = (room?: ChatRoomEntity) => {
   if (room) {
@@ -190,6 +214,10 @@ const scrollToBottom = () => {
   if (chatContainer.value) {
     chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
   }
+};
+const reply = (chat: ChatEntity) => {
+  selectedReply.value = chat;
+  messageInput.value?.focus();
 };
 
 const callRoomsApi = async () => {
@@ -315,6 +343,7 @@ const sendMessage = async () => {
       message: message.value,
       reciepenId: recipient.value.id,
       ...(selectedRoom.value?.id && { chatRoomId: selectedRoom.value.id }),
+      ...(selectedReply.value && { parentChatId: selectedReply.value.id }),
     });
 
     syncSentMessageToSelectedRoom({
@@ -326,9 +355,11 @@ const sendMessage = async () => {
         chatRoomId: selectedRoom.value.id,
         chatRoom: selectedRoom.value,
       }),
+      ...(selectedReply.value && { parentChat: selectedReply.value }),
     });
 
     message.value = "";
+    selectedReply.value = null;
     if (messageInput.value) {
       messageInput.value.focus();
     }

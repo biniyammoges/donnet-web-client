@@ -18,7 +18,7 @@
 
       <div
         :class="{ 'justify-center': !room?.lastChat }"
-        class="flex-1 flex flex-col w-full 2md:max-w-[200px] lg:max-w-[260px]"
+        class="flex-1 flex flex-col w-[50%] 2md:max-w-[200px] lg:max-w-[260px]"
       >
         <p
           :class="{ 'font-medium': !isSender && !room.lastChat?.isSeen }"
