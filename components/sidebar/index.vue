@@ -44,7 +44,11 @@
           </div>
 
           <div class="mb-3">
-            <sidebar-button title="Message" to="/message" :badge="3">
+            <sidebar-button
+              title="Message"
+              to="/message"
+              :badge="unreadMessageCount"
+            >
               <template #icon>
                 <span class="i-mdi-comment-outline"></span>
               </template>
@@ -120,8 +124,10 @@ const route = useRoute();
 const { user, destroyAuthData } = useAuthStore();
 const { openCreatePostModal } = useModalStore();
 const sidebarStore = useSidebarStore();
+const chatStore = useChatStore();
 
 // states
+const { unreadMessageCount } = storeToRefs(chatStore);
 const { collapsed } = storeToRefs(sidebarStore);
 const showSearchBox = ref(false);
 const searchElementRef = ref<HTMLDivElement | null>(null);

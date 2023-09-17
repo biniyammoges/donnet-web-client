@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sticky z-10 top-0 bg-white bg-opacity-60 backdrop-blur-md flex items-center py-2 px-5 border-b border-b-gray-200"
+    class="sticky z-10 top-0 bg-white flex items-center py-2 px-5 border-b border-b-gray-200"
   >
     <button
       @click="emits('on-room-close')"
