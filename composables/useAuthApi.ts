@@ -1,5 +1,5 @@
 import useAxios from '~/composables/useAxios'
-import { AuthResponse, ErrorResponse, LoginDto, RegisterDto, UpdateMeDto } from "types/"
+import { AuthResponse, GlobalAppData, LoginDto, RegisterDto, UpdateMeDto } from "~/types/"
 
 export default function useAuthApi() {
      const login = async (body: LoginDto) => {
@@ -33,5 +33,9 @@ export default function useAuthApi() {
           return resp
      }
 
-     return { login, register, getMe, logout, refreshAccessToken, updateMe }
+     const getGlobalAppData = async () => {
+          return useAxios<GlobalAppData>('/api/global-app-data')
+     }
+
+     return { login, register, getMe, logout, refreshAccessToken, updateMe, getGlobalAppData }
 };

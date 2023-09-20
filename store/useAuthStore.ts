@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { AuthResponse } from "types";
+import { AuthResponse, GlobalAppData } from "types";
 import { User } from "types";
 import { FileEntity } from "types/entities/file.entity";
 
@@ -9,6 +9,8 @@ export const useAuthStore = defineStore('auth-store', () => {
 
      const tokens = ref<AuthResponse | null>(tokensFromCookie.value || null)
      const user = ref<User | null>(null)
+     const unreadMessageCount = ref(0)
+     const unreadNotificationCount = ref(0)
 
      // returns currently loggedin users
      const getUser = computed(() => user.value);
@@ -38,7 +40,17 @@ export const useAuthStore = defineStore('auth-store', () => {
           user.value!.avatar = avatar
      }
 
+     const setUnreadMessageCount = (data: number) => {
+          unreadMessageCount.value = data;
+     }
+
+     const setUnreadNotificationCount = (data: number) => {
+          unreadNotificationCount.value = data;
+     }
+
      return {
+          unreadMessageCount,
+          unreadNotificationCount,
           tokens,
           user,
           getUser,
@@ -47,5 +59,7 @@ export const useAuthStore = defineStore('auth-store', () => {
           setAvatar,
           storeAuthTokens,
           destroyAuthData,
+          setUnreadMessageCount,
+          setUnreadNotificationCount
      }
 })

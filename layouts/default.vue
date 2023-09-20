@@ -8,7 +8,7 @@
 
   <div
     :class="{
-      'sm:ml-[80px]': tokens?.accessToken,
+      'sm:ml-[64px]': tokens?.accessToken,
       'lg:ml-[244px]': tokens?.accessToken && !isOnMessagePage,
     }"
     class="flex-1"

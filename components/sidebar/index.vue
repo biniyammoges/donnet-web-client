@@ -56,7 +56,11 @@
           </div>
 
           <div class="mb-3">
-            <sidebar-button tag="button" title="Notification" :badge="1">
+            <sidebar-button
+              tag="button"
+              title="Notification"
+              :badge="unreadNotificationCount"
+            >
               <template #icon>
                 <span class="i-mdi-bell-outline"></span>
               </template>
@@ -121,13 +125,13 @@ import { storeToRefs } from "pinia";
 const route = useRoute();
 
 // stores
+const authStore = useAuthStore();
 const { user, destroyAuthData } = useAuthStore();
 const { openCreatePostModal } = useModalStore();
 const sidebarStore = useSidebarStore();
-const chatStore = useChatStore();
 
 // states
-const { unreadMessageCount } = storeToRefs(chatStore);
+const { unreadMessageCount, unreadNotificationCount } = storeToRefs(authStore);
 const { collapsed } = storeToRefs(sidebarStore);
 const showSearchBox = ref(false);
 const searchElementRef = ref<HTMLDivElement | null>(null);

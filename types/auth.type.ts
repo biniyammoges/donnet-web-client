@@ -41,3 +41,8 @@ export interface UpdateMeDto {
      birthDate?: String;
      bio?: string
 }
+
+export type GlobalAppData = {
+     unreadMessageCount: number
+     unreadNotificationCount: number
+}

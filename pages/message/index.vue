@@ -185,7 +185,7 @@ const {
 const { setCollapsed } = useSidebarStore();
 const authStore = useAuthStore();
 const chatStore = useChatStore();
-const { user } = storeToRefs(authStore);
+const { user, unreadMessageCount } = storeToRefs(authStore);
 const { rooms, selectedRoom, hasRecentChats } = storeToRefs(chatStore);
 const router = useRouter();
 const route = useRoute();
@@ -276,6 +276,9 @@ const callChatsApi = async (roomId: string) => {
       emitMessageSeenEvent({ chatRoomId: selectedRoom.value?.id! });
 
       // update the ui of room status
+      const unreadCount =
+        unreadMessageCount.value - selectedRoom.value.unreadCount;
+      authStore.setUnreadMessageCount(unreadCount);
       chatStore.updateSelectedRoomsLastChatSeenStatus();
     }
   }
