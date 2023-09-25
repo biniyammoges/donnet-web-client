@@ -114,6 +114,8 @@
       @close="closeSearchBar"
       :search-element-ref="searchElementRef"
     />
+
+    <notification-box />
   </div>
 </template>
 
