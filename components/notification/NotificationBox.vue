@@ -5,7 +5,7 @@
       <h1 class="text-2xl font-bold mt-3 mb-3 text-gray-600">Notifications</h1>
       <div class="flex items-center justify-between">
         <h1 class="text-gray-500">All notifications</h1>
-        <base-button size="small" variant="primaryRevert"
+        <base-button @click="markAllAsRead" size="small" variant="primaryRevert"
           >Mark all as read</base-button
         >
       </div>
@@ -25,6 +25,7 @@
           v-for="notification of notifications"
           :key="notification?.id"
           :notification="notification"
+          @close="emits('close')"
         />
       </div>
     </div>
@@ -35,8 +36,9 @@
 import { storeToRefs } from "pinia";
 import { PropType } from "vue";
 
-const { fetchNotifications } = useNotificationApi();
+const notificationApi = useNotificationApi();
 const notificationStore = useNotificationStore();
+const authStore = useAuthStore();
 
 const props = defineProps({
   notificationElementRef: {
@@ -49,6 +51,12 @@ const emits = defineEmits(["close"]);
 const rootEl = ref<HTMLDivElement | null>(null);
 const loading = ref(false);
 const { notifications } = storeToRefs(notificationStore);
+
+const markAllAsRead = async () => {
+  await notificationApi.readAll();
+  authStore.setUnreadNotificationCount(0);
+  notificationStore.markAllAsRead();
+};
 
 const closeNotificationBar = (e: any) => {
   e.stopPropagation();
@@ -65,7 +73,7 @@ const closeNotificationBar = (e: any) => {
 
 const callNotiApi = async () => {
   loading.value = true;
-  const { data } = await fetchNotifications();
+  const { data } = await notificationApi.fetchNotifications();
   loading.value = false;
 
   if (data.value) {

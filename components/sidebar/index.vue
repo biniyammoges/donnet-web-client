@@ -5,7 +5,7 @@
     <div
       class="h-full flex flex-col items-center"
       :class="{
-        ' pr-3 border-r-[0.7px]': showSearchBox,
+        ' pr-3 border-r-[0.7px]': showSearchBox || showNotificationBox,
       }"
     >
       <div class="my-5">
@@ -55,11 +55,12 @@
             </sidebar-button>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-3" ref="notificationElementRef">
             <sidebar-button
               tag="button"
               title="Notification"
               :badge="unreadNotificationCount"
+              @action="openNotificationBox"
             >
               <template #icon>
                 <span class="i-mdi-bell-outline"></span>
@@ -115,7 +116,11 @@
       :search-element-ref="searchElementRef"
     />
 
-    <notification-box />
+    <notification-box
+      v-if="showNotificationBox"
+      @close="closeNotificationBar"
+      :notification-element-ref="notificationElementRef"
+    />
   </div>
 </template>
 
@@ -137,6 +142,8 @@ const { unreadMessageCount, unreadNotificationCount } = storeToRefs(authStore);
 const { collapsed } = storeToRefs(sidebarStore);
 const showSearchBox = ref(false);
 const searchElementRef = ref<HTMLDivElement | null>(null);
+const showNotificationBox = ref(false);
+const notificationElementRef = ref<HTMLDivElement | null>(null);
 
 // methods
 const openSearchBox = () => {
@@ -147,7 +154,22 @@ const closeSearchBar = () => {
   showSearchBox.value = false;
 };
 
+const openNotificationBox = () => {
+  showNotificationBox.value = true;
+};
+
+const closeNotificationBar = () => {
+  showNotificationBox.value = false;
+};
+
 watch(showSearchBox, (val) => {
+  // exclude expanding sidebar for message page
+  if (!route.path.startsWith("/message")) {
+    sidebarStore.setCollapsed(val);
+  }
+});
+
+watch(showNotificationBox, (val) => {
   // exclude expanding sidebar for message page
   if (!route.path.startsWith("/message")) {
     sidebarStore.setCollapsed(val);

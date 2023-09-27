@@ -8,9 +8,13 @@ export default function useNotificationApi() {
           return resp
      }
 
-     const readNotification = async (id: string) => {
-          return useAxios(`/notification/${id}/read`)
+     const readOne = async (id: string) => {
+          return useAxios(`api/notification/${id}/read`)
      }
 
-     return { fetchNotifications, readNotification }
+     const readAll = async () => {
+          return useAxios(`api/notification/read-all`)
+     }
+
+     return { fetchNotifications, readOne, readAll }
 };

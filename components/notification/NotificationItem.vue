@@ -1,12 +1,11 @@
 <template>
-  <nuxt-link
-    @click="emits('close')"
-    :to="`/u/`"
-    :class="[notification.isRead ? '' : 'font-normal']"
+  <button
+    @click="onClickNotification"
     class="px-2 block hover:bg-blue-50 py-2 rounded-xl"
+    :class="{ 'font-medium ': !notification.isRead }"
     :key="notification.id"
   >
-    <div class="profile flex">
+    <div class="flex items-center">
       <div class="avatar mr-2 block relative h-10 w-10 rounded-full">
         <img
           v-if="notification?.sender?.avatar"
@@ -26,26 +25,41 @@
           }}
         </div>
       </div>
-      <div class="flex flex-col justify-center">
-        <p class="text-gray-500 text- leading-5 truncate">
+      <div class="flex flex-col justify-center items-start">
+        <p
+          :class="[notification.isRead ? 'text-gray-600' : 'text-gray-900']"
+          class="text- leading-5 truncate"
+        >
           {{ notification?.message }}
         </p>
         <p
           v-if="notification.createdAt"
-          class="text-gray-400 text-sm leading-5"
+          :class="[notification.isRead ? 'text-gray-400' : 'text-gray-700']"
+          class="text-sm leading-5"
         >
           {{ dateToTimeAgo(new Date(notification.createdAt)) }}
         </p>
       </div>
+
+      <!-- read indicator -->
+      <div
+        v-if="!notification.isRead"
+        class="flex items-center justify-center ml-auto h-2 w-2 rounded-full bg-blue-600"
+      ></div>
     </div>
-  </nuxt-link>
+  </button>
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import { NotificationEntity } from "types";
 import { PropType } from "vue";
 
-const {} = useNotificationApi()
+const router = useRouter();
+const { readOne } = useNotificationApi();
+const authStore = useAuthStore();
+
+const { unreadNotificationCount } = storeToRefs(authStore);
 
 const props = defineProps({
   notification: {
@@ -55,4 +69,23 @@ const props = defineProps({
 });
 
 const emits = defineEmits(["close"]);
+
+const onClickNotification = async () => {
+  emits("close");
+  if (!props.notification.isRead) {
+    await readOne(props.notification.id!);
+    authStore.setUnreadNotificationCount(unreadNotificationCount.value - 1);
+    props.notification.isRead = true;
+  }
+  let link = "";
+  if (props.notification.action?.startsWith("post")) {
+    link = `/?pId=${props.notification.action.split("post/")[1]}`;
+  } else if (props.notification.action?.startsWith("user")) {
+    link = `/u/${props.notification?.sender?.username}`;
+  }
+
+  if (link) {
+    router.push(link);
+  }
+};
 </script>
