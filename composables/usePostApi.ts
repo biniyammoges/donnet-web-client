@@ -12,6 +12,11 @@ export default function usePostApi() {
           return resp
      }
 
+     const fetchOnePost = async (id: string) => {
+          const resp = await useAxios<PostEntity>(`api/post/retrieve/${id}`)
+          return resp
+     }
+
      const likePost = async (postId: string, unlike = false) => {
           const resp = await useAxios<PostLikeEntity>(`api/post/${postId}/like?${unlike ? 'unlike=true' : ''}`)
           return resp
@@ -47,5 +52,5 @@ export default function usePostApi() {
           return resp
      }
 
-     return { createPost, fetchPosts, likePost, createComment, fetchComments, likeComment, fetchReplies, savePost, fetchSavedPosts }
+     return { createPost, fetchPosts, fetchOnePost, likePost, createComment, fetchComments, likeComment, fetchReplies, savePost, fetchSavedPosts }
 };
