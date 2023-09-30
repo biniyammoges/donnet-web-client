@@ -225,7 +225,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { CommentReplyEventDto, CreateCommentDto } from "types";
+import { CommentEntity, CommentReplyEventDto, CreateCommentDto } from "types";
 import { useModalStore, usePostStore, useAuthStore } from "~/store";
 
 const authStore = useAuthStore();
@@ -306,12 +306,18 @@ const comment = async () => {
   });
 
   if (data.value) {
+    const commentData = {
+      ...data.value,
+      commentor: user.value!,
+      commentorId: user.value?.id,
+    } as CommentEntity;
+
     if (commentDto.parentCommentId) {
-      postModal.addReply(commentDto.parentCommentId, data.value);
+      postModal.addReply(commentDto.parentCommentId, commentData);
     } else {
       updateCommentCount(post.value?.id!);
       post.value!.commentCount! += 1;
-      post.value!.comments?.push(data.value);
+      post.value!.comments?.push(commentData);
     }
   }
 

@@ -22,10 +22,6 @@
           )
         }}
       </div>
-      <span
-        v-if="comment?.commentor?.isOnline"
-        class="h-2 w-2 top-0 right-1 absolute rounded-full bg-green-500"
-      ></span>
     </nuxt-link>
 
     <div>

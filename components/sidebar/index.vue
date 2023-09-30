@@ -164,14 +164,14 @@ const closeNotificationBar = () => {
 
 watch(showSearchBox, (val) => {
   // exclude expanding sidebar for message page
-  if (!route.path.startsWith("/message")) {
+  if (!route.path.startsWith("/message") && !!val) {
     sidebarStore.setCollapsed(val);
   }
 });
 
 watch(showNotificationBox, (val) => {
   // exclude expanding sidebar for message page
-  if (!route.path.startsWith("/message")) {
+  if (!route.path.startsWith("/message") && !!val) {
     sidebarStore.setCollapsed(val);
   }
 });

@@ -22,10 +22,15 @@ export const useNotificationStore = defineStore('notification-store', () => {
           }
      }
 
+     const onNewNotificaiton = (notification: NotificationEntity) => {
+          notifications.value.unshift(notification)
+     }
+
      return {
           notifications,
           setNotifications,
           markAllAsRead,
-          markOneAsRead
+          markOneAsRead,
+          onNewNotificaiton
      }
 })

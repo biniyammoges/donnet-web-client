@@ -20,6 +20,13 @@
         />
       </div>
 
+      <div
+        class="text-gray-600 text-xl font-bold"
+        v-else-if="!loading && !notifications.length"
+      >
+        No notifications yet!
+      </div>
+
       <div v-else class="overflow-y-auto h-[85vh] flex flex-col">
         <notification-item
           v-for="notification of notifications"

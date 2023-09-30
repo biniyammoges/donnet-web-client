@@ -6,17 +6,18 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { ChatEntity } from "~/types";
+import { ChatEntity, NotificationEntity } from "~/types";
 
 const { getGlobalAppData } = useAuthApi();
 
 const { $socketIo } = useNuxtApp();
 const chatStore = useChatStore();
 const authStore = useAuthStore();
-const { unreadMessageCount } = storeToRefs(authStore);
+const notificationStore = useNotificationStore();
+const { unreadMessageCount, unreadNotificationCount } = storeToRefs(authStore);
 const { selectedRoom } = storeToRefs(chatStore);
 
-const listenNewMessage = () => {
+const listenSocketEvents = () => {
   $socketIo.on(ChatSocketEvents.NewMessage, (data: ChatEntity) => {
     chatStore.updateOnNewMessage(data);
 
@@ -24,6 +25,14 @@ const listenNewMessage = () => {
     if (selectedRoom.value?.id !== data?.chatRoomId)
       authStore.setUnreadMessageCount(unreadMessageCount.value + 1);
   });
+
+  $socketIo.on(
+    NotificationSocketEvents.NEW_NOTIFICATION,
+    (data: NotificationEntity) => {
+      notificationStore.onNewNotificaiton(data);
+      authStore.setUnreadNotificationCount(unreadNotificationCount.value + 1);
+    }
+  );
 };
 
 const callGlobalApp = async () => {
@@ -38,7 +47,7 @@ const callGlobalApp = async () => {
 
 onMounted(async () => {
   await nextTick();
-  listenNewMessage();
+  listenSocketEvents();
   await callGlobalApp();
 });
 

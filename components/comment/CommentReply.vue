@@ -23,9 +23,6 @@
             )
           }}
         </div>
-        <span
-          class="hidden h-2 w-2 top-1 right-1 absolute rounded-full bg-green-500"
-        ></span>
       </nuxt-link>
     </div>
 

@@ -112,9 +112,9 @@ const { createPost } = usePostApi();
 const { uploadFile } = useFileApi();
 
 // store composables
-const { addPost } = usePostStore();
+const postStore = usePostStore();
 const globalState = useModalStore();
-const { getUser: user } = useAuthStore();
+const authStore = useAuthStore();
 
 interface UploadI {
   previewUrl: string;
@@ -126,6 +126,7 @@ interface UploadI {
 
 // states
 const { createPostModal } = storeToRefs(globalState);
+const { user } = storeToRefs(authStore);
 const textAreaRef = ref<HTMLTextAreaElement | null>(null);
 const caption = ref("");
 const uploads = ref<UploadI[]>([]);
@@ -199,7 +200,11 @@ const handleSubmit = async () => {
 
   // handles success
   if (res.data.value) {
-    addPost(res.data.value);
+    postStore.addPost({
+      ...res.data.value,
+      creator: user?.value!,
+      creatorId: user.value?.id,
+    });
     uploads.value = [];
     caption.value = "";
     closeModal();
