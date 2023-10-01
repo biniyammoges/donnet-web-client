@@ -58,6 +58,9 @@ import { PropType } from "vue";
 const router = useRouter();
 const { readOne } = useNotificationApi();
 const authStore = useAuthStore();
+const {
+  public: { apiBaseUrl },
+} = useRuntimeConfig();
 
 const { unreadNotificationCount } = storeToRefs(authStore);
 
@@ -79,7 +82,7 @@ const onClickNotification = async () => {
   }
   let link = "";
   if (props.notification.action?.startsWith("post")) {
-    link = `/?pId=${props.notification.action.split("post/")[1]}`;
+    link = `/?post-id=${props.notification.action.split("post/")[1]}`;
   } else if (props.notification.action?.startsWith("user")) {
     link = `/u/${props.notification?.sender?.username}`;
   }

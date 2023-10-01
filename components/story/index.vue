@@ -20,8 +20,6 @@
 const stories = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const storyContainerRef = ref<HTMLDivElement | null>(null);
 
-console.log(storyContainerRef.value?.scrollLeft);
-
 const onScroll = (position: "left" | "right") => {
   const width = storyContainerRef.value?.getBoundingClientRect().width!;
 
@@ -42,8 +40,6 @@ const onScroll = (position: "left" | "right") => {
       behavior: "smooth",
     });
   }
-
-  console.log(storyContainerRef.value?.scrollLeft);
 };
 </script>
 

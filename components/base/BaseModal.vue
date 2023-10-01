@@ -2,7 +2,7 @@
   <Teleport to="body" v-if="modelValue">
     <div
       @click.self="persistant ? null : emit('update:modelValue', false)"
-      class="fixed z-50 top-0 left-0 h-screen w-screen flex justify-center items-center bg-black bg-opacity-10 backdrop-blur-[2px]"
+      class="fixed z-50 top-0 left-0 h-screen w-screen flex justify-center items-center bg-black bg-opacity-60"
     >
       <slot></slot>
     </div>

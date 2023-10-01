@@ -52,6 +52,7 @@ import { storeToRefs } from "pinia";
 
 // composables
 const route = useRoute();
+const router = useRouter();
 const { fetchPosts, fetchOnePost } = usePostApi();
 const { setPosts } = usePostStore();
 const { user } = useAuthStore();
@@ -61,7 +62,6 @@ const { closePreviewPostModal, openPreviewPostModal } = useModalStore();
 const { posts } = storeToRefs(usePostStore());
 const page = ref(1);
 const limit = ref(8);
-const pId = toRef(route.query?.pId ?? "");
 
 const { data, pending: postLoading, execute } = await fetchPosts();
 setPosts(data?.value!);
@@ -77,22 +77,23 @@ const fetchOnScroll = async () => {
 const fetchFromId = async (id: string) => {
   const { data } = await fetchOnePost(id);
 
-  // console.log(data.value);
+  if (data.value) {
+    openPreviewPostModal(data.value);
+    router.push("/");
+  }
 };
 
-watch(pId, () => {
-  console.log(pId.value);
+watchEffect(async () => {
+  if (route.query["post-id"]) {
+    const postId = route.query["post-id"] as string;
+    await fetchFromId(postId);
+  }
 });
 
 onMounted(async () => {
   await nextTick();
   closePreviewPostModal();
   await execute();
-
-  if (route.query?.pId) {
-    pId.value = route.query?.pId as string;
-    await fetchFromId(pId.value);
-  }
 });
 
 useHead({
