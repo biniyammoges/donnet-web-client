@@ -2,9 +2,7 @@
   <nuxt-link
     v-if="tag === 'link'"
     :to="to"
-    :class="[
-      collapsed ? 'collapsed' : isScreenDesktop ? 'enlarged' : 'collapsed',
-    ]"
+    :class="[collapsed ? 'collapsed' : desktopSize ? 'enlarged' : 'collapsed']"
     class="sidebar-button"
   >
     <slot name="icon"></slot>
@@ -15,9 +13,7 @@
   <button
     v-else
     @click="emit('action')"
-    :class="[
-      collapsed ? 'collapsed' : isScreenDesktop ? 'enlarged' : 'collapsed',
-    ]"
+    :class="[collapsed ? 'collapsed' : desktopSize ? 'enlarged' : 'collapsed']"
     class="sidebar-button"
   >
     <slot name="icon"></slot>
@@ -53,7 +49,7 @@ const props = defineProps({
 });
 
 const screenWidth = ref(0);
-const isScreenDesktop = computed(() => screenWidth.value >= 1024);
+const desktopSize = computed(() => screenWidth.value >= 1024);
 
 const updateScreenWidth = () => {
   screenWidth.value = window.innerWidth;

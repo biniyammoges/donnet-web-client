@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-3 relative">
+  <div class="relative">
     <button @click="onScroll('left')" class="story-scroll-btn prev">
       <span class="i-mdi-chevron-left"></span>
     </button>

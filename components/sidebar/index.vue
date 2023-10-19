@@ -3,18 +3,33 @@
     class="bg-white border-r-[0.5px] border-r-gray-300 px-3 md:px-3 py-2 fixed left-0 top-0 bottom-0 flex z-50"
   >
     <div
-      class="h-full flex flex-col items-center"
+      class="h-full flex flex-col"
       :class="{
         ' pr-3 border-r-[0.7px]': showSearchBox || showNotificationBox,
+        'items-center': collapsed,
       }"
     >
       <div class="my-5">
-        <sidebar-button tag="button" title="Donnet">
-          <template #icon> <span class="i-mdi-menu"></span> </template>
-        </sidebar-button>
+        <h1
+          :class="[collapsed ? 'text-2xl' : 'text-3xl px-3']"
+          class="font-bold text-gray-900 flex items-center"
+        >
+          <div class="relative">
+            <div
+              class="absolutes bg-blue-500 w-5 h-5 rounded-full left-0"
+            ></div>
+            <div
+              class="absolute bg-orange-500 bg-opacity-90 w-5 h-5 rounded-full -right-2 -top-2"
+            ></div>
+          </div>
+          <div v-if="!collapsed" class="ml-3">
+            Shatty<span class="text-blue-600">.</span>
+          </div>
+        </h1>
       </div>
 
       <div
+        :class="{ 'mt-4': collapsed }"
         class="h-full flex flex-col items-center justify-between z-20 flex-1"
       >
         <!-- Links -->
@@ -162,17 +177,17 @@ const closeNotificationBar = () => {
   showNotificationBox.value = false;
 };
 
-watch(showSearchBox, (val) => {
+watch(showSearchBox, () => {
   // exclude expanding sidebar for message page
-  if (!route.path.startsWith("/message") && !!val) {
-    sidebarStore.setCollapsed(val);
+  if (!route.path.startsWith("/message") && showSearchBox.value) {
+    sidebarStore.setCollapsed(showSearchBox.value);
   }
 });
 
-watch(showNotificationBox, (val) => {
+watch(showNotificationBox, () => {
   // exclude expanding sidebar for message page
-  if (!route.path.startsWith("/message") && !!val) {
-    sidebarStore.setCollapsed(val);
+  if (!route.path.startsWith("/message") && showNotificationBox.value) {
+    sidebarStore.setCollapsed(showNotificationBox.value);
   }
 });
 
