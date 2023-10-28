@@ -1,10 +1,11 @@
 <template>
   <div
-    class="story-item relative flex-shrink-0 w-full max-w-[90px] overflow-hidden h-[140px] rounded-xl cursor-pointer"
+    class="story-item relative flex-shrink-0 w-full max-w-[90px] overflow-hidden h-[140px] rounded-xl cursor-pointer border-2 border-blue-200"
   >
     <img
+      v-if="story?.medias?.length"
       class="story-image h-full absolute top-0 left-0 w-full object-cover z-20"
-      src="~/assets/images/image-1.jpg"
+      :src="story?.medias[0].file.url"
       alt="image"
     />
     <div class="overlay"></div>
@@ -16,15 +17,27 @@
         alt="image"
       />
     </div>
-    <div class="z-40 absolute w-full bottom-3">
+    <div class="z-40 absolute w-full bottom-3 px-2">
       <p
         class="truncate creator text-white font-semibold w-full text-xs bottom-3 text-center"
       >
-        Biniyam Moges
+        {{ story?.creator?.firstName + " " + story?.creator?.lastName ?? "" }}
       </p>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { StoryEntity } from "types";
+import { PropType } from "vue";
+
+const props = defineProps({
+  story: {
+    type: Object as PropType<StoryEntity>,
+    requried: true,
+  },
+});
+</script>
 
 <style scoped>
 .story-item:hover .story-image {

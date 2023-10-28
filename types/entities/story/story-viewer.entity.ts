@@ -1,10 +1,10 @@
 import { BaseEntity } from "../base.entity";
 import { User } from "../user.entity";
-import { Story } from "./story.entity";
+import { StoryEntity } from "./story.entity";
 
-export class StoryViewer extends BaseEntity {
+export class StoryViewerEnity extends BaseEntity {
      storyId?: string;
-     story?: Story;
+     story?: StoryEntity;
      viewerId?: string;
      viewer?: User;
 }

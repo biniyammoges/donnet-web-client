@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white border-r-[0.5px] border-r-gray-300 px-3 md:px-3 py-2 fixed left-0 top-0 bottom-0 flex z-50"
+    class="bg-white border-r-[0.5px] border-r-gray-300 px-3 md:px-3 py-2 fixed left-0 top-0 bottom-0 flex z-40"
   >
     <div
       class="h-full flex flex-col"

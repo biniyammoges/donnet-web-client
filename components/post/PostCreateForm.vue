@@ -1,6 +1,6 @@
 <template>
   <base-modal v-model="createPostModal" persistant>
-    <div class="bg-white w-[500px] rounded-xl p-5">
+    <div class="bg-white w-[500px] rounded-xl p-5 mx-4 sm:mx-auto">
       <div class="flex items-center justify-between">
         <h1 class="text-2xl text-gray-700">Create post</h1>
         <button

@@ -1,18 +1,18 @@
 import { BaseEntity } from "../base.entity";
 import { User } from "../user.entity";
-import { StoryViewer } from "./story-viewer.entity";
-import { StoryMedia } from "./strory-media.entity";
+import { StoryViewerEnity } from "./story-viewer.entity";
+import { StoryMediaEntity } from "./strory-media.entity";
 
-export class Story extends BaseEntity {
+export class StoryEntity extends BaseEntity {
      creatorId?: string
      creator?: User
      expire?: Date
      isArchived?: boolean;
-     medias?: StoryMedia[]
-     viewers?: StoryViewer[]
+     medias?: StoryMediaEntity[]
+     viewers?: StoryViewerEnity[]
      storyMessages?: any[]
 
-     constructor(data?: Partial<Story>) {
+     constructor(data?: Partial<StoryEntity>) {
           super()
           Object.assign(this, data)
      }

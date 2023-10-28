@@ -1,13 +1,13 @@
 import { BaseEntity } from "../base.entity";
-import { Story } from "./story.entity";
+import { StoryEntity } from "./story.entity";
 
-export class StoryMedia extends BaseEntity {
+export class StoryMediaEntity extends BaseEntity {
      storyId?: string;
-     story?: Story;
+     story?: StoryEntity;
      fileId?: string;
      file?: any;
 
-     constructor(data?: Partial<StoryMedia>) {
+     constructor(data?: Partial<StoryMediaEntity>) {
           super()
           Object.assign(this, data)
      }

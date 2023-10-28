@@ -123,14 +123,18 @@ import { storeToRefs } from "pinia";
 const route = useRoute();
 const router = useRouter();
 const { fetchPosts, fetchOnePost } = usePostApi();
+const { retrieveStories } = useStoryApi();
 const { setPosts } = usePostStore();
 const { user } = useAuthStore();
+const { setStories } = useStoryStore();
 const { closePreviewPostModal, openPreviewPostModal } = useModalStore();
 
 // state
 const { posts } = storeToRefs(usePostStore());
 const page = ref(1);
 const limit = ref(8);
+
+const storyLoading = ref(false);
 
 const { data, pending: postLoading, execute } = await fetchPosts();
 setPosts(data?.value!);
@@ -152,6 +156,14 @@ const fetchFromId = async (id: string) => {
   }
 };
 
+const callStoryApi = async () => {
+  storyLoading.value = true;
+  const { data } = await retrieveStories();
+  storyLoading.value = false;
+
+  setStories(data.value!);
+};
+
 watchEffect(async () => {
   if (route.query["post-id"]) {
     const postId = route.query["post-id"] as string;
@@ -162,7 +174,7 @@ watchEffect(async () => {
 onMounted(async () => {
   await nextTick();
   closePreviewPostModal();
-  await execute();
+  await Promise.all([callStoryApi(), execute()]);
 });
 
 useHead({

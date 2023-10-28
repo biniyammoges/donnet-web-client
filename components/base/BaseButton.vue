@@ -3,7 +3,7 @@
     <button
       :disabled="disabled"
       :type="type"
-      class="h-full bg text-center w-full rounded-[10px] px-4 flex items-center justify-center disabled:bg-gray-300 disabled:text-gray-400"
+      class="h-full bg text-center w-full px-4 flex items-center justify-center disabled:bg-gray-300 disabled:text-gray-400"
       :class="{
         'bg-blue-600 text-white hover:bg-blue-600 active:bg-blue-700':
           variant === 'primary',
@@ -13,6 +13,8 @@
         'bg-red-600 text-white': variant === 'error',
         'bg-red-50 text-red-700': variant === 'errorRevert',
         'text-sm': size === 'small',
+        'rounded-[10px]': rounded === 'default',
+        'rounded-full': rounded === 'full',
       }"
     >
       <div class="loader" ref="loader"></div>
@@ -47,6 +49,10 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
   size: {
     type: String as PropType<"small" | "default">,
+    default: "default",
+  },
+  rounded: {
+    type: String as PropType<"default" | "full">,
     default: "default",
   },
 });
