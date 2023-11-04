@@ -28,7 +28,7 @@
       <Post v-else />
     </div>
     <div
-      class="pt-3 px-4 pb-16 lg:w-[350px] xl:w-[400px] shrink-0 hidden lg:block"
+      class="sticky top-0 pt-3 px-4 pb-16 lg:w-[350px] xl:w-[400px] shrink-0 hidden lg:block"
     >
       <div
         class="flex justify-between items-center bg-white px-3 py-2 rounded-lg border-[0.3px]"

@@ -5,8 +5,8 @@
     :class="{ 'font-medium ': !notification.isRead }"
     :key="notification.id"
   >
-    <div class="flex items-center">
-      <div class="avatar mr-2 block relative h-10 w-10 rounded-full">
+    <div class="flex">
+      <div class="avatar mr-2 block relative h-10 w-10 rounded-full shrink-0">
         <img
           v-if="notification?.sender?.avatar"
           :src="notification?.sender?.avatar?.url"
@@ -28,7 +28,7 @@
       <div class="flex flex-col justify-center items-start">
         <p
           :class="[notification.isRead ? 'text-gray-600' : 'text-gray-900']"
-          class="text- leading-5 truncate"
+          class="text- leading-5 text-left"
         >
           {{ notification?.message }}
         </p>

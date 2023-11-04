@@ -272,7 +272,7 @@ const callPostApi = async () => {
 const callSavedPostApi = async () => {
   const { data } = await fetchSavedPosts();
   if (data.value) {
-    savedPosts.value = data.value.map((sp) => sp.post!) ?? [];
+    // savedPosts.value = data.value.map((sp) => sp.post!) ?? [];
   }
 };
 

@@ -47,48 +47,93 @@
       class="fixed w-screen h-screen flex items-center justify-evenly bg-black bg-opacity-70 z-50"
     >
       <!-- story  -->
+      <story-preview
+        @click="selectStory(activeStoryIdx - 2)"
+        v-if="stories[activeStoryIdx - 2]"
+        :class="{ 'opacity-0 invisible': !stories[activeStoryIdx - 2] }"
+        :story="stories[activeStoryIdx - 2]"
+      />
+      <!-- empty placeholder for not active story -->
+      <div v-else class="max-w-[150px] w-full"></div>
 
-      <div class="max-h-[250px] h-full w-[150px] bg-green-200 rounded-xl"></div>
-      <div class="max-h-[250px] h-full w-[150px] bg-green-200 rounded-xl"></div>
+      <story-preview
+        @click="selectStory(activeStoryIdx - 1)"
+        v-if="stories[activeStoryIdx - 1]"
+        :story="stories[activeStoryIdx - 1]"
+      />
+      <!-- empty placeholder for not active story -->
+      <div v-else class="max-w-[150px] w-full"></div>
+
       <div
         v-if="stories[activeStoryIdx]"
-        class="max-h-[600px] h-full w-[370px] bg-black bg-opacity-80 rounded-xl"
+        class="max-h-[600px] h-full w-[370px] bg-black bg-opacity-80 rounded-3xl shrink-0 relative overflow-hidden"
       >
-        <!-- story header -->
-        <div class="flex items-center px-4 py-3">
-          <!-- avatar -->
-          <div class="avatar relative">
-            <img
-              class="h-full absolute top-0 left-0 w-full object-cover z-20"
-              src="~/assets/images/image-1.jpg"
-              alt="image"
-            />
-          </div>
-          <!-- creator detail -->
-          <div class="ml-2">
-            <h1 class="text-white text-lg font-medium leading-5">
-              {{
-                stories[activeStoryIdx]?.creator?.firstName +
-                  " " +
-                  stories[activeStoryIdx]?.creator?.lastName ?? ""
-              }}
-            </h1>
-            <p class="text-white">{{ dateToTimeAgo(new Date()) }}</p>
+        <div
+          class="top-overlay absolute bg-black w-full h-[100px] top-0 left-0"
+        ></div>
+        <div class="absolute w-full">
+          <!-- story play time indicator -->
+          <div class="px-4 mt-3">
+            <div
+              class="w-full h-[3px] bg-gray-400 rounded bg-opacity-70 relative"
+            >
+              <div class="bg-white rounded h-[3px] w-[200px]"></div>
+            </div>
           </div>
 
-          <!-- actions -->
-          <div class="text-white ml-auto flex gap-x-2 items-center">
-            <button
-              class="w-10 h-10 bg-white bg-opacity-30 rounded-full text-2xl flex items-center justify-center"
-            >
-              <span class="i-mdi-play"></span>
-            </button>
+          <!-- story header -->
+          <div class="flex items-center px-4 py-3">
+            <!-- avatar -->
+            <div class="avatar relative shrink-0">
+              <img
+                v-if="stories[activeStoryIdx].creator?.avatar?.url"
+                :src="stories[activeStoryIdx].creator.avatar.url"
+                alt="image"
+                class="h-full w-full rounded-full object-cover border border-yellow-500"
+              />
+              <div
+                v-else
+                class="w-10 h-10 rounded-full border text-gray-500 border-gray-500 flex items-center justify-center"
+              >
+                {{
+                  joinFirstCharacters(
+                    stories[activeStoryIdx].creator?.firstName,
+                    stories[activeStoryIdx].creator?.lastName
+                  )
+                }}
+              </div>
+            </div>
+
+            <!-- creator detail -->
+            <div class="ml-3">
+              <h1 class="text-white font-mediums leading-5">
+                {{
+                  stories[activeStoryIdx]?.creator?.firstName +
+                    " " +
+                    stories[activeStoryIdx]?.creator?.lastName ?? ""
+                }}
+              </h1>
+              <p class="text-gray-200 text-sm">
+                {{ dateToTimeAgo(new Date()) }}
+              </p>
+            </div>
+
+            <!-- actions -->
+            <div class="text-white ml-auto flex shrink-0 gap-x-2 items-center">
+              <button
+                @click="playPauseToggle"
+                class="w-8 h-8 bg-white bg-opacity-30 rounded-full text-2xl flex items-center justify-center"
+              >
+                <span :class="[paused ? 'i-mdi-play' : 'i-mdi-pause']"></span>
+              </button>
+            </div>
           </div>
         </div>
 
+        <!-- story image -->
         <div
           v-if="stories[activeStoryIdx].medias?.length"
-          class="w-full h-[470px]"
+          class="w-full h-[90%]"
         >
           <img
             :src="stories[activeStoryIdx].medias[0].file.url"
@@ -96,9 +141,36 @@
             class="object-contain h-full w-full"
           />
         </div>
+
+        <!-- story actions -->
+        <div class="flex px-4 items-center gap-x-2 mt-2">
+          <input
+            type="text"
+            placeholder="Reply to story"
+            class="px-5 py-2 rounded-full w-full bg-white bg-opacity-30 text-white outline-none"
+          />
+          <button
+            class="w-9 h-9 bg-white bg-opacity-30 rounded-full shrink-0 text-lg flex items-center justify-center text-white"
+          >
+            <span class="i-mdi-heart-outline"></span>
+          </button>
+        </div>
       </div>
-      <div class="max-h-[250px] h-full w-[150px] bg-green-200 rounded-xl"></div>
-      <div class="max-h-[250px] h-full w-[150px] bg-green-200 rounded-xl"></div>
+      <story-preview
+        @click="selectStory(activeStoryIdx + 1)"
+        v-if="stories[activeStoryIdx + 1]"
+        :story="stories[activeStoryIdx + 1]"
+      />
+      <!-- empty placeholder for not active story -->
+      <div v-else class="max-w-[150px] w-full"></div>
+
+      <story-preview
+        @click="selectStory(activeStoryIdx + 2)"
+        v-if="stories[activeStoryIdx + 2]"
+        :story="stories[activeStoryIdx + 2]"
+      />
+      <!-- empty placeholder for not active story -->
+      <div v-else class="max-w-[150px] w-full"></div>
     </div>
   </teleport>
 
@@ -150,11 +222,14 @@ const activeStoryIdx = ref<number>(0);
 
 const selectStory = (idx: number) => {
   activeStoryIdx.value = idx;
-  showStories.value = true;
+
+  if (!showStories.value) {
+    showStories.value = true;
+  }
 };
 
-const pauseStory = () => {
-  paused.value = true;
+const playPauseToggle = () => {
+  paused.value = !paused.value;
 };
 
 const onScroll = (position: "left" | "right") => {
@@ -201,5 +276,15 @@ const onScroll = (position: "left" | "right") => {
 
 .avatar {
   @apply overflow-hidden h-10 w-10 rounded-full border-2 border-white z-40;
+}
+
+.top-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.7),
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0)
+  );
 }
 </style>
